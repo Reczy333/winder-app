@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Winder — демо</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --bg: #f4f3f8; --surface: #ffffff; --surface-2: #f7f6fb; --text: #16151c; --muted: #6b6878;
+  --line: #e6e4ee; --accent: #6c4cf5; --accent-soft: #efeafe; --on-accent: #ffffff;
+  --like: #1a9b5c; --like-soft: #e3f6ec; --nope: #e5484d; --nope-soft: #fde8e9;
+  --star: #f5a524; --self: #b9aef8; --peer: #6c4cf5; --shadow: 0 10px 30px rgba(30, 20, 70, .12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0e14; --surface: #1b1a23; --surface-2: #23222c; --text: #f2f1f7; --muted: #9a97a8;
+    --line: #2d2b38; --accent: #9b85ff; --accent-soft: #2a2445; --on-accent: #120d26;
+    --like: #3ccf87; --like-soft: #143425; --nope: #ff6b6f; --nope-soft: #3a1a1c;
+    --self: #4d4387; --peer: #9b85ff; --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0e14; --surface: #1b1a23; --surface-2: #23222c; --text: #f2f1f7; --muted: #9a97a8;
+  --line: #2d2b38; --accent: #9b85ff; --accent-soft: #2a2445; --on-accent: #120d26;
+  --like: #3ccf87; --like-soft: #143425; --nope: #ff6b6f; --nope-soft: #3a1a1c;
+  --self: #4d4387; --peer: #9b85ff; --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg); color: var(--text);
+  font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  overscroll-behavior: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+[hidden] { display: none !important; }
+
+#app { height: 100dvh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+
+/* шапка */
+.top { padding: 12px 16px 8px; display: flex; flex-direction: column; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.logo { font-weight: 800; font-size: 20px; letter-spacing: -.02em; color: var(--accent); }
+.pill { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+.brand .who { margin-left: auto; font-size: 12px; color: var(--muted); }
+.vac { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; }
+.vac-label { font-size: 11px; color: var(--muted); }
+.vac select { width: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; padding: 0; appearance: none; -webkit-appearance: none; }
+.vac .chev { color: var(--muted); }
+.vac-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+section.screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+/* колода */
+.deck { position: relative; flex: 1; min-height: 0; margin: 4px 16px 0; }
+.card {
+  position: absolute; inset: 0; background: var(--surface); border-radius: 22px; box-shadow: var(--shadow);
+  overflow: hidden; display: flex; flex-direction: column; touch-action: none; user-select: none;
+  transition: transform .3s ease, opacity .3s ease; will-change: transform;
+}
+.card.behind { transform: scale(.95) translateY(10px); opacity: .7; pointer-events: none; }
+.card.dragging { transition: none; }
+.hero { position: relative; flex: 0 0 38%; min-height: 120px; display: flex; align-items: flex-end; padding: 16px; color: #fff; }
+.hero .initials { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -62%); font-size: 64px; font-weight: 800; opacity: .9; letter-spacing: -.03em; }
+.hero h2 { margin: 0; font-size: 24px; line-height: 1.1; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+.hero .sub { font-size: 13px; opacity: .95; text-shadow: 0 1px 6px rgba(0,0,0,.25); }
+.hero .fitbadge { position: absolute; top: 12px; left: 12px; font-size: 11px; font-weight: 700; background: rgba(0,0,0,.28); backdrop-filter: blur(6px); padding: 4px 9px; border-radius: 99px; }
+.stamp { position: absolute; top: 18px; font-size: 22px; font-weight: 900; padding: 4px 12px; border: 3px solid; border-radius: 10px; opacity: 0; letter-spacing: .04em; background: rgba(255,255,255,.85); }
+.stamp.like { left: 16px; color: var(--like); transform: rotate(-12deg); }
+.stamp.nope { right: 16px; color: var(--nope); transform: rotate(12deg); }
+.body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; flex: 1; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 4px 9px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); white-space: nowrap; }
+.chip.hit { background: var(--like-soft); border-color: transparent; color: var(--like); font-weight: 600; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.tag-self { font-size: 10px; font-weight: 700; color: var(--muted); border: 1px dashed var(--muted); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 1px; text-transform: none; letter-spacing: 0; }
+.rating { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.rating b { font-size: 16px; }
+.star { color: var(--star); }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.exp-line { font-size: 13px; }
+.ok { color: var(--like); font-weight: 600; font-size: 12px; white-space: nowrap; }
+.more { margin-top: auto; font-size: 12px; color: var(--accent); font-weight: 600; }
+
+/* кнопки свайпа */
+.actions { display: flex; justify-content: center; align-items: center; gap: 18px; padding: 14px 16px 6px; }
+.btn-round { width: 62px; height: 62px; border-radius: 50%; background: var(--surface); box-shadow: var(--shadow); font-size: 26px; display: grid; place-items: center; transition: transform .12s; }
+.btn-round:active { transform: scale(.92); }
+.btn-round.nope { color: var(--nope); }
+.btn-round.like { color: var(--like); }
+.btn-round.info { width: 46px; height: 46px; font-size: 18px; color: var(--accent); font-weight: 800; }
+.rule-note { text-align: center; font-size: 11px; color: var(--muted); margin: 0 16px 8px; }
+
+.empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; padding: 24px; background: var(--surface); border-radius: 22px; }
+.empty .big { font-size: 40px; }
+
+/* таббар */
+.tabs { display: flex; border-top: 1px solid var(--line); background: var(--surface); padding-bottom: env(safe-area-inset-bottom); }
+.tabs button { flex: 1; padding: 10px 0 12px; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; position: relative; }
+.tabs button .ic { font-size: 18px; }
+.tabs button.on { color: var(--accent); font-weight: 600; }
+.badge { position: absolute; top: 4px; left: calc(50% + 8px); background: var(--nope); color: #fff; font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 8px; display: grid; place-items: center; padding: 0 4px; }
+
+/* списки и страницы */
+.page { overflow-y: auto; padding: 4px 16px 24px; display: flex; flex-direction: column; gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.panel h3 { margin: 0; font-size: 15px; }
+.panel p { margin: 0; }
+.mrow { display: flex; gap: 12px; align-items: center; }
+.ava { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 800; flex: none; }
+.mrow .grow { flex: 1; min-width: 0; }
+.mrow .name { font-weight: 600; }
+.btn { padding: 10px 14px; border-radius: 12px; font-weight: 600; font-size: 14px; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { background: var(--accent-soft); color: var(--accent); }
+.btn.wide { width: 100%; }
+.status { font-size: 12px; padding: 4px 9px; border-radius: 99px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+ul.rules { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+
+/* лист профиля */
+.sheet { position: fixed; inset: 0; z-index: 20; background: var(--bg); overflow-y: auto; animation: up .25s ease; }
+.sheet-inner { max-width: 480px; margin: 0 auto; padding-bottom: 96px; }
+@keyframes up { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet .hero { flex: none; height: 200px; }
+.close { position: absolute; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%; background: rgba(0,0,0,.3); color: #fff; font-size: 18px; z-index: 2; }
+.sheet .page { padding-top: 12px; overflow: visible; }
+.why { background: var(--accent-soft); border-color: transparent; }
+.why .lbl { color: var(--accent); }
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 96px 1fr; gap: 8px; align-items: center; font-size: 13px; }
+.bar-pair { display: flex; flex-direction: column; gap: 3px; }
+.bar { height: 7px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.bar > i { display: block; height: 100%; border-radius: 4px; }
+.bar.self > i { background: var(--self); }
+.bar.peer > i { background: var(--peer); }
+.legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.legend .ls::before { background: var(--self); }
+.legend .lp::before { background: var(--peer); }
+.diff { font-size: 11px; color: var(--muted); grid-column: 2; margin-top: -4px; }
+.review { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.review:first-of-type { border-top: 0; padding-top: 0; }
+.review .who { font-size: 12px; color: var(--muted); }
+.lock { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); background: var(--surface-2); border-radius: 12px; padding: 10px 12px; }
+.sheet-actions { position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; display: flex; justify-content: center; gap: 18px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--bg) 35%); }
+
+/* match */
+.overlay { position: fixed; inset: 0; z-index: 30; background: rgba(15, 10, 40, .82); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 24px; animation: fade .2s ease; }
+@keyframes fade { from { opacity: 0; } }
+.match-box { width: 100%; max-width: 380px; text-align: center; color: #fff; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.match-box h2 { margin: 0; font-size: 34px; font-weight: 900; letter-spacing: -.02em; }
+.match-avas { display: flex; }
+.match-avas .ava { width: 84px; height: 84px; font-size: 28px; border: 3px solid #fff; }
+.match-avas .ava + .ava { margin-left: -16px; }
+.contact { background: rgba(255,255,255,.12); border-radius: 14px; padding: 12px; width: 100%; }
+.match-box .btn { width: 100%; }
+.match-box .btn.ghost { background: rgba(255,255,255,.14); color: #fff; }
+
+/* модалка отзыва */
+.modal { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; animation: fade .2s; }
+.modal-box { background: var(--bg); width: 100%; max-width: 480px; max-height: 92dvh; overflow-y: auto; border-radius: 22px 22px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; animation: up .25s; }
+.modal-box h3 { margin: 0; }
+.scale { display: flex; gap: 6px; }
+.scale button { flex: 1; padding: 8px 0; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-weight: 600; }
+.scale button.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; padding: 10px; resize: vertical; }
+
+.toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <span class="logo">Winder</span>
+      <span class="pill">ДЕМО</span>
+      <span class="who">вы — работодатель</span>
+    </div>
+    <label class="vac">
+      <div style="flex:1;min-width:0">
+        <div class="vac-label">Вакансия</div>
+        <select id="vacSelect"></select>
+        <div class="vac-meta" id="vacMeta"></div>
+      </div>
+      <span class="chev">▾</span>
+    </label>
+  </header>
+
+  <main>
+    <section class="screen" id="screen-feed">
+      <div class="deck" id="deck"></div>
+      <div class="actions" id="feedActions">
+        <button class="btn-round nope" id="btnNope" aria-label="Пропустить">✕</button>
+        <button class="btn-round info" id="btnInfo" aria-label="Открыть профиль">i</button>
+        <button class="btn-round like" id="btnLike" aria-label="Интересно">✓</button>
+      </div>
+      <p class="rule-note">Порядок — по правилам: график → навыки → заполненность профиля. Это не ИИ.</p>
+    </section>
+
+    <section class="screen" id="screen-matches" hidden>
+      <div class="page" id="matchesPage"></div>
+    </section>
+
+    <section class="screen" id="screen-about" hidden>
+      <div class="page" id="aboutPage"></div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-tab="feed" class="on"><span class="ic">🃏</span>Кандидаты</button>
+    <button data-tab="matches"><span class="ic">🤝</span>Мэтчи<span class="badge" id="matchBadge" hidden></span></button>
+    <button data-tab="about"><span class="ic">ℹ️</span>Как это работает</button>
+  </nav>
+</div>
+
+<div id="sheet" class="sheet" hidden></div>
+<div id="overlay" hidden></div>
+<div id="modal" hidden></div>
+
+<script>
+// ---------- Данные демо (все люди вымышленные) ----------
+const CATS = [
+  { k: 0, n: 'Организатор' }, { k: 1, n: 'Коммуникатор' }, { k: 2, n: 'Исполнитель' },
+  { k: 3, n: 'Аналитик' }, { k: 4, n: 'Креатив' },
+];
+
+const VACANCIES = [
+  { id: 'v1', title: 'Бариста-стажёр', employer: 'Кофейня у метро', format: 'Офлайн',
+    schedule: ['Выходные', 'Утро будни'], skills: ['Общение с людьми', 'Стрессоустойчивость', 'Касса/продажи'], pay: '320 ₽/час' },
+  { id: 'v2', title: 'Помощник на мероприятия', employer: 'Event-агентство', format: 'Офлайн',
+    schedule: ['Вечер будни', 'Выходные'], skills: ['Организация', 'Общение с людьми', 'Тайм-менеджмент'], pay: '2 500 ₽/смена' },
+  { id: 'v3', title: 'Помощник SMM', employer: 'Онлайн-школа', format: 'Удалённо',
+    schedule: ['Гибкий'], skills: ['Тексты', 'Дизайн', 'Соцсети'], pay: '25 000 ₽/мес' },
+];
+
+// self / s — оценки по 5 категориям в порядке CATS, шкала 1–5
+const STUDENTS = [
+  { id: 'a1', name: 'Алина', age: 19, uni: 'РЭУ · 2 курс · маркетинг', hue: 330, handle: '@alina_demo',
+    schedule: ['Вечер будни', 'Выходные'], format: ['Офлайн', 'Удалённо'], skills: ['Организация', 'Общение с людьми', 'Соцсети'],
+    pay: 'от 350 ₽/час', completeness: 95, likes: ['v2', 'v1'],
+    exp: [{ t: 'Студенческий форум на 300 участников', r: 'Координатор волонтёров', c: 2 },
+          { t: 'Школа актива', r: 'Куратор группы', c: 1 }],
+    self: [5, 4, 3, 2, 3],
+    reviews: [
+      { a: 'Event-агентство', rel: 'Помощник на 3 мероприятиях', s: [5, 5, 4, 3, 3], rec: true, t: 'Координировала волонтёров на площадке: замены, инструктаж, тайминг. Ни одного пустого поста.' },
+      { a: 'Организатор конференции', rel: 'Регистрация гостей, 2 дня', s: [4, 5, 4, 2, 3], rec: true, t: 'С гостями — идеально. Иногда берёт лишние задачи и потом догоняет по срокам.' },
+      { a: 'Кофейня', rel: 'Смены на выходных, 1 мес.', s: [4, 4, 4, 3, 3], rec: true, t: 'Быстро влилась, гости её запоминают. Пару раз опоздала к открытию.' },
+      { a: 'Студенческое промо-агентство', rel: 'Промо-акция', s: [5, 4, 4, 3, 4], rec: true, t: 'Предлагает решения сама, не ждёт указаний.' },
+    ] },
+  { id: 'm2', name: 'Максим', age: 20, uni: '3 курс · экономика', hue: 210, handle: '@maxim_demo',
+    schedule: ['Выходные', 'Утро будни'], format: ['Офлайн'], skills: ['Касса/продажи', 'Стрессоустойчивость', 'Общение с людьми'],
+    pay: 'от 300 ₽/час', completeness: 80, likes: ['v1'],
+    exp: [{ t: 'Летнее кафе', r: 'Бариста (сезон)', c: 1 }, { t: 'Городской фестиваль', r: 'Промоутер', c: 1 }],
+    self: [2, 3, 5, 3, 2],
+    reviews: [
+      { a: 'Летнее кафе', rel: 'Сезон, 3 мес.', s: [3, 4, 5, 3, 2], rec: true, t: '' },
+      { a: 'Промо-агентство', rel: 'Фестиваль, 2 дня', s: [2, 4, 5, 3, 2], rec: true, t: '' },
+    ] },
+  { id: 's3', name: 'Соня', age: 18, uni: '1 курс · дизайн', hue: 25, handle: '@sonya_demo',
+    schedule: ['Гибкий'], format: ['Удалённо'], skills: ['Дизайн', 'Соцсети', 'Тексты'],
+    pay: 'по договорённости', completeness: 70, likes: ['v3'],
+    exp: [{ t: 'Студенческий клуб', r: 'Оформление соцсетей', c: 1 }, { t: 'Студенческий театр', r: 'Афиши и анонсы', c: 0 }],
+    self: [2, 3, 3, 2, 5],
+    reviews: [{ a: 'Небольшой магазин одежды', rel: 'Разовый проект', s: [2, 3, 4, 2, 5], rec: true, t: '' }] },
+  { id: 't4', name: 'Тимур', age: 21, uni: '4 курс · прикладная информатика', hue: 170, handle: '@timur_demo',
+    schedule: ['Вечер будни', 'Выходные'], format: ['Удалённо', 'Офлайн'], skills: ['Аналитика', 'Excel', 'Тайм-менеджмент', 'Организация'],
+    pay: 'от 400 ₽/час', completeness: 90, likes: ['v2'],
+    exp: [{ t: 'Кейс-чемпионат по аналитике', r: 'Финалист, капитан команды', c: 3 },
+          { t: 'Студенческий фестиваль', r: 'Техническая команда', c: 2 }],
+    self: [2, 3, 4, 5, 2],
+    reviews: [
+      { a: 'Онлайн-школа', rel: 'Отчёты по продажам, 2 мес.', s: [3, 3, 5, 5, 2], rec: true, t: 'Собрал дашборд, которым пользуемся до сих пор. Сказал — сделал.' },
+      { a: 'Event-агентство', rel: 'Техподдержка мероприятия', s: [4, 3, 4, 4, 2], rec: true, t: 'Спокоен в форс-мажоре. Не самый разговорчивый, но на брифингах — по делу.' },
+      { a: 'Интернет-магазин', rel: 'Разовый проект', s: [4, 4, 4, 5, 3], rec: true, t: 'Сам организовал работу двух других студентов на проекте.' },
+    ] },
+  { id: 'd5', name: 'Даша', age: 19, uni: '2 курс · журналистика', hue: 280, handle: '@dasha_demo',
+    schedule: ['Гибкий'], format: ['Удалённо'], skills: ['Тексты', 'Соцсети', 'Общение с людьми'],
+    pay: 'по договорённости', completeness: 85, likes: ['v3'],
+    exp: [{ t: 'Студенческое медиа', r: 'Редактор рубрики', c: 3 }],
+    self: [3, 4, 3, 3, 4],
+    reviews: [
+      { a: 'Онлайн-школа', rel: 'Тексты для соцсетей, 3 мес.', s: [3, 4, 5, 3, 4], rec: true, t: 'Сдаёт в срок, правки принимает без обид. Пишет живо.' },
+      { a: 'Кофейня', rel: 'Посты для Telegram-канала', s: [3, 5, 4, 3, 4], rec: true, t: 'Быстро поймала наш тон, гости стали чаще отвечать в комментариях.' },
+      { a: 'Студия йоги', rel: 'Разовый проект', s: [3, 4, 4, 3, 3], rec: false, t: 'Текст хороший, но согласование затянулось на неделю — не хватило инициативы напомнить.' },
+    ] },
+  { id: 'e6', name: 'Егор', age: 20, uni: '2 курс · менеджмент', hue: 120, handle: '@egor_demo',
+    schedule: ['Выходные', 'Вечер будни'], format: ['Офлайн'], skills: ['Организация', 'Стрессоустойчивость', 'Общение с людьми'],
+    pay: 'от 300 ₽/час', completeness: 55, likes: [],
+    exp: [{ t: 'Городской марафон', r: 'Волонтёр на старте', c: 0 }],
+    self: [5, 5, 4, 3, 4], reviews: [] },
+  { id: 'p7', name: 'Полина', age: 22, uni: 'магистратура · финансы', hue: 50, handle: '@polina_demo',
+    schedule: ['Утро будни', 'День будни'], format: ['Офлайн', 'Удалённо'], skills: ['Excel', 'Аналитика', 'Касса/продажи'],
+    pay: 'от 350 ₽/час', completeness: 90, likes: ['v1'],
+    exp: [{ t: 'Студенческий научный кружок', r: 'Отвечала за отчёты', c: 2 }, { t: 'Магазин у дома', r: 'Продавец-кассир', c: 1 }],
+    self: [3, 3, 5, 4, 2],
+    reviews: [
+      { a: 'Магазин у дома', rel: 'Кассир, 6 мес.', s: [3, 4, 5, 4, 2], rec: true, t: 'Касса всегда сходилась. Спокойно общается даже с конфликтными покупателями.' },
+      { a: 'Бухгалтерская фирма', rel: 'Сезон отчётности', s: [3, 3, 5, 5, 2], rec: true, t: 'Таблицы без единой ошибки. Педантичная в хорошем смысле.' },
+      { a: 'Кофейня', rel: 'Утренние смены, 2 мес.', s: [4, 3, 4, 4, 3], rec: true, t: 'Наладила учёт поставок, который до неё никто не вёл.' },
+    ] },
+  { id: 'r8', name: 'Артём', age: 18, uni: '1 курс · гостиничное дело', hue: 0, handle: '@artem_demo',
+    schedule: ['Выходные'], format: ['Офлайн'], skills: ['Общение с людьми', 'Касса/продажи', 'Стрессоустойчивость'],
+    pay: 'от 300 ₽/час', completeness: 85, likes: ['v1', 'v2'],
+    exp: [{ t: 'Летний лагерь', r: 'Вожатый отряда', c: 2 }, { t: 'Школьный выпускной', r: 'Организатор', c: 1 }],
+    self: [4, 5, 4, 2, 3],
+    reviews: [
+      { a: 'Кофейня', rel: 'Смены на выходных, 3 мес.', s: [4, 5, 4, 3, 4], rec: true, t: 'Гости его обожают. Очередь в час пик держит спокойно.' },
+      { a: 'Event-агентство', rel: 'Встреча гостей на фестивале', s: [4, 5, 5, 2, 4], rec: true, t: 'Энергичный, всегда подменит, если нужно.' },
+      { a: 'Пекарня', rel: 'Продавец, 1 мес.', s: [4, 4, 4, 3, 3], rec: true, t: 'Ответственный. Иногда спешит с решениями — стоит чуть больше советоваться.' },
+      { a: 'Кинотеатр', rel: 'Кассы на выходных', s: [3, 5, 4, 2, 3], rec: true, t: 'Быстро обучился кассе, конфликтов не было.' },
+    ] },
+  { id: 'v9', name: 'Вика', age: 20, uni: '3 курс · реклама', hue: 300, handle: '@vika_demo',
+    schedule: ['Вечер будни', 'Выходные'], format: ['Офлайн', 'Удалённо'], skills: ['Соцсети', 'Дизайн', 'Организация'],
+    pay: 'от 350 ₽/час', completeness: 85, likes: ['v3'],
+    exp: [{ t: 'Студенческий фестиваль', r: 'SMM фестиваля', c: 2 }],
+    self: [5, 5, 4, 4, 5],
+    reviews: [
+      { a: 'Онлайн-школа', rel: 'Сторис, 1 мес.', s: [3, 4, 3, 3, 4], rec: true, t: '' },
+      { a: 'Салон красоты', rel: 'Разовый проект', s: [3, 3, 4, 3, 4], rec: false, t: '' },
+    ] },
+  { id: 'i10', name: 'Илья', age: 21, uni: '3 курс · бизнес-информатика', hue: 230, handle: '@ilya_demo',
+    schedule: ['День будни', 'Вечер будни'], format: ['Удалённо'], skills: ['Тексты', 'Аналитика', 'Excel'],
+    pay: 'от 350 ₽/час', completeness: 65, likes: [],
+    exp: [{ t: 'Учебный проект для малого бизнеса', r: 'Аналитик', c: 1 }],
+    self: [2, 2, 4, 5, 3],
+    reviews: [{ a: 'Интернет-магазин', rel: 'Разовый проект', s: [2, 3, 4, 4, 3], rec: true, t: '' }] },
+];
+
+const MIN_PUBLIC_TEXTS = 3; // текст отзывов публичен не раньше третьего
+
+// ---------- Состояние ----------
+const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0 };
+const key = (vacId, sid) => vacId + ':' + sid;
+const vac = () => VACANCIES.find(v => v.id === state.vacId);
+const byId = id => STUDENTS.find(s => s.id === id);
+
+// ---------- Telegram ----------
+const tg = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData !== undefined ? window.Telegram.WebApp : null;
+const inTelegram = !!(tg && tg.platform && tg.platform !== 'unknown');
+if (inTelegram) {
+  tg.ready(); tg.expand();
+  document.documentElement.dataset.theme = tg.colorScheme === 'dark' ? 'dark' : 'light';
+  try { const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(); tg.setHeaderColor(bg); tg.setBackgroundColor(bg); } catch (e) {}
+}
+const haptic = (kind) => {
+  if (!inTelegram || !tg.HapticFeedback) return;
+  if (kind === 'match') tg.HapticFeedback.notificationOccurred('success');
+  else tg.HapticFeedback.impactOccurred('light');
+};
+
+// ---------- Rule-based сортировка (не ИИ) ----------
+function fit(s, v) {
+  if (!s.format.includes(v.format)) return null; // формат — жёсткий фильтр
+  const flex = s.schedule.includes('Гибкий');
+  const schedHit = v.schedule.filter(x => flex || x === 'Гибкий' || s.schedule.includes(x)).length;
+  const skillHit = v.skills.filter(x => s.skills.includes(x)).length;
+  const score = 0.5 * schedHit / v.schedule.length + 0.3 * skillHit / v.skills.length + 0.2 * s.completeness / 100;
+  return { schedHit, schedTotal: v.schedule.length, skillHit, skillTotal: v.skills.length, score };
+}
+
+function queue() {
+  const v = vac();
+  return STUDENTS
+    .map(s => ({ s, f: fit(s, v) }))
+    .filter(x => x.f && !state.decisions[key(v.id, x.s.id)])
+    .sort((a, b) => b.f.score - a.f.score);
+}
+
+// ---------- Отзывы ----------
+function stats(s) {
+  const n = s.reviews.length;
+  if (!n) return { n: 0 };
+  const per = CATS.map(c => s.reviews.reduce((acc, r) => acc + r.s[c.k], 0) / n);
+  const rec = Math.round(100 * s.reviews.filter(r => r.rec).length / n);
+  return { n, per, rec };
+}
+const plural = (n, one, few, many) => {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+};
+const reviewsWord = n => n + ' ' + plural(n, 'отзыв', 'отзыва', 'отзывов');
+const peopleWord = n => plural(n, 'подтвердил', 'подтвердили', 'подтвердили') + ' ' + n + ' ' + plural(n, 'участник', 'участника', 'участников');
+const topSelf = s => CATS.map(c => ({ n: c.n, v: s.self[c.k] })).sort((a, b) => b.v - a.v).slice(0, 2).map(x => x.n);
+const grad = h => `linear-gradient(135deg, hsl(${h} 70% 58%), hsl(${(h + 40) % 360} 75% 45%))`;
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function ratingHTML(s) {
+  const st = stats(s);
+  if (!st.n) return `<div class="rating muted small">Отзывов пока нет — новичок на платформе</div>`;
+  // Главная цифра — «наняли бы снова». Среднее по категориям не показываем: это профиль сильных сторон, а не оценка качества
+  return `<div class="rating"><span>👍</span><b>${st.rec}%</b>
+    <span class="muted small">наняли бы снова · ${reviewsWord(st.n)}</span></div>`;
+}
+
+// ---------- Карточка ----------
+function cardHTML(s, f, v) {
+  const sched = s.schedule.map(x => `<span class="chip ${x === 'Гибкий' || v.schedule.includes(x) || v.schedule.includes('Гибкий') ? 'hit' : ''}">${x}</span>`).join('');
+  const skills = s.skills.map(x => `<span class="chip ${v.skills.includes(x) ? 'hit' : ''}">${x}</span>`).join('');
+  const e = s.exp[0];
+  return `
+    <div class="hero" style="background:${grad(s.hue)}">
+      <span class="fitbadge">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal}</span>
+      <span class="initials">${s.name[0]}</span>
+      <div><h2>${s.name}, ${s.age}</h2><div class="sub">${s.uni}</div></div>
+      <span class="stamp like">ИНТЕРЕСНО</span><span class="stamp nope">НЕТ</span>
+    </div>
+    <div class="body">
+      ${ratingHTML(s)}
+      <div class="row">${sched}</div>
+      <div class="row">${skills}</div>
+      <div><div class="lbl">Опыт</div>
+        <div class="exp-line"><b>${e.r}</b> — ${e.t} ${e.c ? `<span class="ok">✓ ${e.c}</span>` : ''}</div></div>
+      <div><div class="lbl">Сильные стороны <span class="tag-self">самооценка</span></div>
+        <div class="exp-line">${topSelf(s).join(' · ')}</div></div>
+      <div class="more">Нажмите, чтобы открыть профиль →</div>
+    </div>`;
+}
+
+// ---------- Колода и свайп ----------
+const deckEl = document.getElementById('deck');
+
+function renderDeck() {
+  const v = vac();
+  document.getElementById('vacMeta').textContent = `${v.employer} · ${v.format} · ${v.schedule.join(', ')} · ${v.pay}`;
+  const q = queue();
+  deckEl.innerHTML = '';
+  document.getElementById('feedActions').style.visibility = q.length ? 'visible' : 'hidden';
+  if (!q.length) {
+    const liked = STUDENTS.filter(s => state.decisions[key(v.id, s.id)] === 'like').length;
+    const hidden = STUDENTS.filter(s => !fit(s, v)).length;
+    const m = state.matches.filter(x => x.vacId === v.id).length;
+    deckEl.innerHTML = `<div class="empty">
+      <div class="big">🎉</div><h3 style="margin:0">Кандидаты закончились</h3>
+      <p class="muted" style="margin:0">Интересно: ${liked} · мэтчей: ${m}<br>Не подошли по формату работы (${v.format}): ${hidden}</p>
+      <button class="btn primary" id="restart">Посмотреть заново</button></div>`;
+    document.getElementById('restart').onclick = () => {
+      STUDENTS.forEach(s => { if (!state.matches.some(x => x.vacId === v.id && x.sid === s.id)) delete state.decisions[key(v.id, s.id)]; });
+      renderDeck();
+    };
+    return;
+  }
+  q.slice(0, 2).reverse().forEach((x, i, arr) => {
+    const el = document.createElement('div');
+    el.className = 'card' + (i < arr.length - 1 ? ' behind' : '');
+    el.innerHTML = cardHTML(x.s, x.f, v);
+    el.dataset.sid = x.s.id;
+    deckEl.appendChild(el);
+  });
+  attachDrag(deckEl.lastElementChild);
+}
+
+function topCard() { return deckEl.querySelector('.card:not(.behind)'); }
+
+function attachDrag(el) {
+  let sx = 0, sy = 0, dx = 0, dy = 0, down = false;
+  const like = el.querySelector('.stamp.like'), nope = el.querySelector('.stamp.nope');
+  el.addEventListener('pointerdown', e => {
+    down = true; sx = e.clientX; sy = e.clientY; dx = dy = 0;
+    el.setPointerCapture(e.pointerId); el.classList.add('dragging');
+  });
+  el.addEventListener('pointermove', e => {
+    if (!down) return;
+    dx = e.clientX - sx; dy = e.clientY - sy;
+    el.style.transform = `translate(${dx}px, ${dy * 0.25}px) rotate(${dx / 18}deg)`;
+    like.style.opacity = Math.max(0, Math.min(1, dx / 90));
+    nope.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+  });
+  const end = () => {
+    if (!down) return;
+    down = false; el.classList.remove('dragging');
+    if (Math.abs(dx) > 100) { decide(dx > 0 ? 'like' : 'nope'); return; }
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) openProfile(el.dataset.sid);
+    el.style.transform = ''; like.style.opacity = 0; nope.style.opacity = 0;
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+}
+
+function decide(dir, sid) {
+  const v = vac();
+  const el = topCard();
+  sid = sid || (el && el.dataset.sid);
+  if (!sid) return;
+  haptic('tap');
+  state.decisions[key(v.id, sid)] = dir;
+  const s = byId(sid);
+  const done = () => {
+    renderDeck();
+    if (dir !== 'like') return;
+    if (s.likes.includes(v.id)) {
+      state.matches.unshift({ vacId: v.id, sid });
+      updateBadge(); showMatch(s, v);
+    } else {
+      toast(`${s.name} увидит вашу вакансию в своей ленте. Если ответит взаимностью — будет мэтч.`);
+    }
+  };
+  if (el && el.dataset.sid === sid) {
+    el.classList.remove('dragging');
+    el.querySelector('.stamp.' + dir).style.opacity = 1;
+    el.style.transform = `translate(${dir === 'like' ? 150 : -150}vw, 40px) rotate(${dir === 'like' ? 25 : -25}deg)`;
+    el.style.opacity = 0;
+    setTimeout(done, 260);
+  } else done();
+}
+
+document.getElementById('btnLike').onclick = () => decide('like');
+document.getElementById('btnNope').onclick = () => decide('nope');
+document.getElementById('btnInfo').onclick = () => { const el = topCard(); if (el) openProfile(el.dataset.sid); };
+
+// ---------- Профиль ----------
+const sheet = document.getElementById('sheet');
+const isMatched = sid => state.matches.some(m => m.sid === sid);
+
+function openProfile(sid) {
+  const s = byId(sid), v = vac(), f = fit(s, v), st = stats(s);
+  const decided = state.decisions[key(v.id, sid)];
+  const bars = CATS.map(c => {
+    const self = s.self[c.k], peer = st.n ? st.per[c.k] : null;
+    let diff = '';
+    if (peer !== null && self - peer >= 1.5) diff = '<div class="diff">самооценка заметно выше отзывов</div>';
+    if (peer !== null && peer - self >= 1.5) diff = '<div class="diff">отзывы заметно выше самооценки</div>';
+    return `<div class="bar-row"><span>${c.n}</span><div class="bar-pair">
+      <div class="bar self"><i style="width:${self * 20}%"></i></div>
+      ${peer !== null ? `<div class="bar peer"><i style="width:${peer * 20}%"></i></div>` : ''}
+    </div>${diff}</div>`;
+  }).join('');
+
+  let reviewsBlock;
+  if (!st.n) {
+    reviewsBlock = `<div class="lock">💬<span>Отзывов пока нет. Оставить отзыв может только работодатель после подтверждённого мэтча. На старте профиль держится на подтверждённом опыте.</span></div>`;
+  } else if (st.n < MIN_PUBLIC_TEXTS) {
+    reviewsBlock = `${ratingHTML(s)}<div class="lock">🔒<span>Тексты отзывов откроются после ${MIN_PUBLIC_TEXTS}-го отзыва — так один отзыв не может ни испортить профиль, ни раздуть его. Доля «наняли бы снова» видна сразу.</span></div>`;
+  } else {
+    reviewsBlock = ratingHTML(s) + s.reviews.map(r => `<div class="review">
+        <div class="who">${r.a} · ${r.rel} · ${r.rec ? '👍 нанял(а) бы снова' : '— не уверен(а), что нанял(а) бы снова'}</div>
+        <div>${esc(r.t)}</div></div>`).join('');
+  }
+
+  const contacts = isMatched(sid)
+    ? `<div class="mrow"><span style="font-size:22px">✈️</span><div class="grow"><div class="name">${s.handle}</div><div class="small muted">Telegram (вымышленный)</div></div></div>`
+    : `<div class="lock">🔒<span>Контакты откроются после взаимного мэтча — когда студент тоже отметит вашу вакансию.</span></div>`;
+
+  sheet.innerHTML = `<div class="sheet-inner">
+    <div class="hero" style="background:${grad(s.hue)}">
+      <button class="close" id="closeSheet" aria-label="Закрыть">✕</button>
+      <span class="initials">${s.name[0]}</span>
+      <div><h2>${s.name}, ${s.age}</h2><div class="sub">${s.uni}</div></div>
+    </div>
+    <div class="page">
+      ${f ? `<div class="panel why"><div class="lbl">Почему в ленте на этом месте</div>
+        <p>График: ${f.schedHit} из ${f.schedTotal} · Навыки: ${f.skillHit} из ${f.skillTotal} · Профиль заполнен на ${s.completeness}%</p>
+        <p class="small muted">Сортировка по понятным правилам, а не «ИИ-подбор».</p></div>` : ''}
+
+      <div class="panel"><h3>Доступность</h3>
+        <div class="row">${s.schedule.map(x => `<span class="chip">${x}</span>`).join('')}${s.format.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+        <p class="small muted">Желаемая оплата: ${s.pay}</p></div>
+
+      <div class="panel"><h3>Опыт</h3>
+        ${s.exp.map(e => `<div class="mrow"><div class="grow"><div class="name">${e.r}</div><div class="small muted">${e.t}</div></div>
+          ${e.c ? `<span class="ok">✓ ${peopleWord(e.c)}</span>` : '<span class="status">не подтверждено</span>'}</div>`).join('')}</div>
+
+      <div class="panel"><h3>Сильные стороны</h3>
+        <div class="legend"><span class="ls">Тест (самооценка)</span>${st.n ? '<span class="lp">По отзывам работодателей</span>' : ''}</div>
+        <div class="bars">${bars}</div>
+        <p class="small muted">Тест — самоотчёт студента, а не психологическая диагностика. Поэтому рядом всегда оценки из реальных отзывов: совпадение или расхождение — тоже информация.</p></div>
+
+      <div class="panel"><h3>Отзывы</h3>${reviewsBlock}</div>
+      <div class="panel"><h3>Контакты</h3>${contacts}</div>
+    </div></div>
+    ${!decided && f ? `<div class="sheet-actions">
+      <button class="btn-round nope" id="sNope" aria-label="Пропустить">✕</button>
+      <button class="btn-round like" id="sLike" aria-label="Интересно">✓</button></div>` : ''}`;
+  sheet.hidden = false; sheet.scrollTop = 0;
+  document.getElementById('closeSheet').onclick = closeProfile;
+  const sl = document.getElementById('sLike'), sn = document.getElementById('sNope');
+  if (sl) sl.onclick = () => { closeProfile(); setTimeout(() => decide('like', sid), 50); };
+  if (sn) sn.onclick = () => { closeProfile(); setTimeout(() => decide('nope', sid), 50); };
+  if (inTelegram) { tg.BackButton.show(); }
+}
+function closeProfile() { sheet.hidden = true; if (inTelegram) tg.BackButton.hide(); }
+if (inTelegram) tg.BackButton.onClick(() => { if (!document.getElementById('modal').hidden) closeModal(); else closeProfile(); });
+
+// ---------- Мэтч ----------
+const overlay = document.getElementById('overlay');
+function showMatch(s, v) {
+  haptic('match');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `<div class="match-box">
+    <div class="match-avas">
+      <div class="ava" style="background:${grad(260)}">${v.employer[0]}</div>
+      <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
+    </div>
+    <h2>Это мэтч!</h2>
+    <p style="margin:0;opacity:.9">${s.name} тоже отметил(а) вакансию «${v.title}». Контакты открыты обеим сторонам.</p>
+    <div class="contact">✈️ <b>${s.handle}</b><div class="small" style="opacity:.75">Telegram (вымышленный)</div></div>
+    <button class="btn primary" id="mWrite">Написать в Telegram</button>
+    <button class="btn ghost" id="mNext">Смотреть дальше</button></div>`;
+  overlay.hidden = false;
+  document.getElementById('mWrite').onclick = () => toast('В демо чат не открывается. В продукте здесь откроется диалог в Telegram.');
+  document.getElementById('mNext').onclick = () => { overlay.hidden = true; };
+}
+
+// ---------- Мэтчи и отзыв ----------
+function updateBadge() {
+  const b = document.getElementById('matchBadge');
+  const fresh = state.matches.length - state.seenMatches;
+  b.hidden = fresh <= 0; b.textContent = fresh;
+}
+
+function renderMatches() {
+  const page = document.getElementById('matchesPage');
+  if (!state.matches.length) {
+    page.innerHTML = `<div class="panel"><h3>Пока нет мэтчей</h3><p class="muted">Мэтч — это когда вы отметили студента, а он вашу вакансию. Только после этого открываются контакты и можно оставить отзыв.</p></div>`;
+    return;
+  }
+  page.innerHTML = state.matches.map(m => {
+    const s = byId(m.sid), v = VACANCIES.find(x => x.id === m.vacId), k = key(m.vacId, m.sid);
+    return `<div class="panel"><div class="mrow">
+        <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
+        <div class="grow"><div class="name">${s.name}, ${s.age}</div><div class="small muted">${v.title} · ${s.handle}</div></div></div>
+      ${state.reviewed[k]
+        ? `<span class="status">✓ Отзыв отправлен на модерацию</span>`
+        : `<button class="btn ghost wide" data-review="${k}">Поработали вместе? Оставить отзыв</button>`}
+    </div>`;
+  }).join('');
+  page.querySelectorAll('[data-review]').forEach(b => b.onclick = () => openReview(b.dataset.review));
+}
+
+const modal = document.getElementById('modal');
+function openReview(k) {
+  const sid = k.split(':')[1], s = byId(sid);
+  const vals = {}; let rec = null;
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>Отзыв о студенте: ${s.name}</h3>
+    <p class="small muted" style="margin:0">Отзыв можно оставить только после подтверждённого мэтча. Перед публикацией его проверит модератор. Оцените по тем же категориям, что и в тесте, — так работодатели видят, совпадает ли самооценка с реальностью.</p>
+    ${CATS.map(c => `<div><div class="small" style="margin-bottom:4px">${c.n}</div>
+      <div class="scale" data-cat="${c.k}">${[1, 2, 3, 4, 5].map(n => `<button data-v="${n}">${n}</button>`).join('')}</div></div>`).join('')}
+    <div><div class="small" style="margin-bottom:4px">Наняли бы снова?</div>
+      <div class="scale" id="recScale"><button data-v="1">Да</button><button data-v="0">Нет</button></div></div>
+    <textarea id="revText" placeholder="Что получилось хорошо, что можно улучшить (необязательно)"></textarea>
+    <button class="btn primary wide" id="revSend">Отправить на модерацию</button>
+    <button class="btn wide" id="revCancel">Отмена</button></div>`;
+  modal.hidden = false;
+  modal.querySelectorAll('.scale[data-cat]').forEach(sc => sc.querySelectorAll('button').forEach(b => b.onclick = () => {
+    sc.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); vals[sc.dataset.cat] = +b.dataset.v;
+  }));
+  modal.querySelectorAll('#recScale button').forEach(b => b.onclick = () => {
+    modal.querySelectorAll('#recScale button').forEach(x => x.classList.remove('on')); b.classList.add('on'); rec = b.dataset.v === '1';
+  });
+  document.getElementById('revCancel').onclick = closeModal;
+  modal.onclick = e => { if (e.target === modal) closeModal(); };
+  document.getElementById('revSend').onclick = () => {
+    if (Object.keys(vals).length < CATS.length || rec === null) { toast('Поставьте оценку по всем категориям и ответьте, наняли бы снова'); return; }
+    state.reviewed[k] = true; closeModal(); renderMatches();
+    toast('Отзыв отправлен на модерацию. Текст станет публичным, когда у студента будет 3+ отзыва.');
+  };
+}
+function closeModal() { modal.hidden = true; }
+
+// ---------- О демо ----------
+function renderAbout() {
+  document.getElementById('aboutPage').innerHTML = `
+    <div class="panel"><h3>Что это</h3>
+      <p>Демо-прототип Winder со стороны работодателя. <b>Все студенты, отзывы и контакты вымышленные.</b> Данные никуда не отправляются.</p></div>
+    <div class="panel"><h3>Как работает</h3><ul class="rules">
+      <li>Вы листаете профили студентов под вашу вакансию: вправо — интересно, влево — нет.</li>
+      <li>Если студент тоже отметил вашу вакансию — мэтч, и обеим сторонам открываются контакты.</li>
+      <li>Профиль строится на опыте в проектах и мероприятиях, тесте и отзывах, а не на резюме.</li></ul></div>
+    <div class="panel"><h3>Почему профилю можно доверять</h3><ul class="rules">
+      <li>Опыт подтверждают другие участники проекта.</li>
+      <li>Отзыв оставляет только работодатель после подтверждённого мэтча.</li>
+      <li>Текст отзывов публичен не раньше третьего отзыва; доля «наняли бы снова» видна сразу.</li>
+      <li>Тест на сильные стороны — самооценка, а не психодиагностика. Рядом всегда оценки из отзывов.</li>
+      <li>Порядок в ленте — по понятным правилам (график, навыки, заполненность), не ИИ.</li>
+      <li>Профили и отзывы проходят ручную модерацию.</li></ul></div>
+    <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
+  document.getElementById('resetDemo').onclick = () => {
+    state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
+    updateBadge(); renderDeck(); toast('Демо сброшено');
+  };
+}
+
+// ---------- Навигация ----------
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  state.tab = b.dataset.tab;
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  ['feed', 'matches', 'about'].forEach(t => document.getElementById('screen-' + t).hidden = t !== state.tab);
+  if (state.tab === 'matches') { state.seenMatches = state.matches.length; updateBadge(); renderMatches(); }
+  if (state.tab === 'about') renderAbout();
+  haptic('tap');
+});
+
+const sel = document.getElementById('vacSelect');
+sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${v.employer}: ${v.title}</option>`).join('');
+sel.onchange = () => { state.vacId = sel.value; renderDeck(); };
+
+let toastTimer;
+function toast(msg) {
+  let t = document.querySelector('.toast');
+  if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg; clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.remove(), 3200);
+}
+
+renderDeck();
+</script>
+</body>
+</html>
