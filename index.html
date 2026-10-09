@@ -63,7 +63,7 @@ section.screen { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 }
 .card.behind { transform: scale(.95) translateY(10px); opacity: .7; pointer-events: none; }
 .card.dragging { transition: none; }
-.hero { position: relative; flex: 0 0 38%; min-height: 120px; display: flex; align-items: flex-end; padding: 16px; color: #fff; }
+.hero { position: relative; flex: 0 0 30%; min-height: 110px; display: flex; align-items: flex-end; padding: 16px; color: #fff; }
 .hero .initials { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -62%); font-size: 64px; font-weight: 800; opacity: .9; letter-spacing: -.03em; }
 .hero h2 { margin: 0; font-size: 24px; line-height: 1.1; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
 .hero .sub { font-size: 13px; opacity: .95; text-shadow: 0 1px 6px rgba(0,0,0,.25); }
@@ -71,10 +71,23 @@ section.screen { flex: 1; min-height: 0; display: flex; flex-direction: column; 
 .stamp { position: absolute; top: 18px; font-size: 22px; font-weight: 900; padding: 4px 12px; border: 3px solid; border-radius: 10px; opacity: 0; letter-spacing: .04em; background: rgba(255,255,255,.85); }
 .stamp.like { left: 16px; color: var(--like); transform: rotate(-12deg); }
 .stamp.nope { right: 16px; color: var(--nope); transform: rotate(12deg); }
-.body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; flex: 1; }
+.body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; flex: 1; }
+.card .chip { font-size: 11px; padding: 3px 7px; }
+.card .row { gap: 4px; }
+.card .hero .initials { font-size: 56px; left: auto; right: 18px; top: 50%; transform: translateY(-50%); opacity: .35; }
 .row { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { font-size: 12px; padding: 4px 9px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); white-space: nowrap; }
-.chip.hit { background: var(--like-soft); border-color: transparent; color: var(--like); font-weight: 600; }
+/* у каждого критерия свой оттенок (--h) и иконка; совпадение с вакансией — галочка */
+.chip.c { background: hsl(var(--h) 85% 94%); border-color: hsl(var(--h) 60% 85%); color: hsl(var(--h) 55% 30%); font-weight: 500; }
+.chip .ci { margin-right: 4px; }
+.chip.hit { font-weight: 700; border-color: hsl(var(--h) 55% 55%); }
+.chip.hit::after { content: " ✓"; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chip.c { background: hsl(var(--h) 35% 18%); border-color: hsl(var(--h) 35% 28%); color: hsl(var(--h) 80% 78%); }
+  :root:not([data-theme="light"]) .chip.hit { border-color: hsl(var(--h) 60% 60%); }
+}
+:root[data-theme="dark"] .chip.c { background: hsl(var(--h) 35% 18%); border-color: hsl(var(--h) 35% 28%); color: hsl(var(--h) 80% 78%); }
+:root[data-theme="dark"] .chip.hit { border-color: hsl(var(--h) 60% 60%); }
 .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
 .tag-self { font-size: 10px; font-weight: 700; color: var(--muted); border: 1px dashed var(--muted); border-radius: 6px; padding: 1px 5px; margin-left: 4px; vertical-align: 1px; text-transform: none; letter-spacing: 0; }
 .rating { display: flex; align-items: center; gap: 6px; font-size: 14px; }
@@ -169,6 +182,37 @@ ul.rules { margin: 0; padding-left: 18px; display: flex; flex-direction: column;
 .scale button.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; padding: 10px; resize: vertical; }
 
+/* режим просмотра и фильтры */
+.toolbar { display: flex; gap: 8px; }
+.seg { display: flex; flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.seg button { flex: 1; padding: 7px 0; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button.on { background: var(--accent-soft); color: var(--accent); }
+.fbtn { padding: 0 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.fbtn.active { color: var(--accent); border-color: var(--accent); }
+.vac-req { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* список кандидатов */
+.list { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+.lrow { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; }
+.lrow.skipped { opacity: .5; }
+.lrow .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.lrow .icons { font-size: 13px; }
+.miss-i { filter: grayscale(1); opacity: .35; }
+.lbtns { display: flex; gap: 8px; }
+.mini { width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); font-size: 17px; display: grid; place-items: center; flex: none; }
+.mini.nope { color: var(--nope); }
+.mini.like { color: var(--like); }
+.status.ok-s { background: var(--like-soft); color: var(--like); font-weight: 600; }
+
+/* практичные поля */
+.chip.miss { opacity: .55; border-style: dashed; }
+.facts { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.fact { display: flex; gap: 10px; align-items: baseline; }
+.fact .fk { color: var(--muted); min-width: 132px; font-size: 13px; }
+.need { color: var(--nope); font-weight: 600; font-size: 12px; white-space: nowrap; }
+.trow { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 14px; }
+.trow input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
+
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -185,9 +229,17 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
         <div class="vac-label">Вакансия</div>
         <select id="vacSelect"></select>
         <div class="vac-meta" id="vacMeta"></div>
+        <div class="vac-req" id="vacReq"></div>
       </div>
       <span class="chev">▾</span>
     </label>
+    <div class="toolbar">
+      <div class="seg" role="tablist">
+        <button data-view="swipe" class="on">🃏 Свайпы</button>
+        <button data-view="list">☰ Список</button>
+      </div>
+      <button class="fbtn" id="filterBtn">Фильтры</button>
+    </div>
   </header>
 
   <main>
@@ -198,7 +250,8 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
         <button class="btn-round info" id="btnInfo" aria-label="Открыть профиль">i</button>
         <button class="btn-round like" id="btnLike" aria-label="Интересно">✓</button>
       </div>
-      <p class="rule-note">Порядок — по правилам: график → навыки → заполненность профиля. Это не ИИ.</p>
+      <div class="list" id="list" hidden></div>
+      <p class="rule-note">Порядок — по правилам: график → навыки → требования → заполненность профиля. Это не ИИ.</p>
     </section>
 
     <section class="screen" id="screen-matches" hidden>
@@ -330,10 +383,45 @@ const STUDENTS = [
     reviews: [{ a: 'Интернет-магазин', rel: 'Разовый проект', s: [2, 3, 4, 4, 3], rec: true, t: '' }] },
 ];
 
+// Где вакансия и что нужно работодателю (must — обязательно, иначе желательно)
+Object.assign(VACANCIES[0], { metro: 'Китай-город', okrug: 'ЦАО', req: [{ k: 'med', must: true }, { k: 'self', must: false }] });
+Object.assign(VACANCIES[1], { metro: 'Динамо', okrug: 'САО', req: [{ k: 'license', must: false }, { k: 'self', must: false }] });
+Object.assign(VACANCIES[2], { req: [{ k: 'laptop', must: true }, { k: 'eng', must: false }] });
+
+// Практичное о студенте: метро, округа, где готов работать (без точного адреса), права, медкнижка и т. д.
+const EXTRA = {
+  a1:  { metro: 'Добрынинская', areas: ['ЦАО', 'ЮАО'], license: null, car: false, med: true, selfEmp: true, langs: [['Английский', 'B1']], laptop: true },
+  m2:  { metro: 'Китай-город', areas: ['ЦАО', 'ВАО'], license: 'B', car: false, med: true, selfEmp: false, langs: [], laptop: false },
+  s3:  { metro: 'Медведково', areas: ['СВАО'], license: null, car: false, med: false, selfEmp: false, langs: [['Английский', 'A2']], laptop: true },
+  t4:  { metro: 'Сокол', areas: ['САО', 'ЦАО', 'СЗАО'], license: 'B', car: true, med: false, selfEmp: true, langs: [['Английский', 'B2']], laptop: true },
+  d5:  { metro: 'Выхино', areas: ['ЮВАО'], license: null, car: false, med: false, selfEmp: true, langs: [['Английский', 'C1'], ['Испанский', 'A2']], laptop: true },
+  e6:  { metro: 'Пражская', areas: ['ЮАО', 'ЦАО'], license: 'B', car: true, med: false, selfEmp: false, langs: [], laptop: false },
+  p7:  { metro: 'Таганская', areas: ['ЦАО', 'ЮВАО'], license: null, car: false, med: true, selfEmp: true, langs: [['Английский', 'B1']], laptop: true },
+  r8:  { metro: 'Тушинская', areas: ['СЗАО', 'САО'], license: null, car: false, med: true, selfEmp: false, langs: [], laptop: false },
+  v9:  { metro: 'Белорусская', areas: ['ЦАО', 'САО'], license: 'B', car: false, med: false, selfEmp: true, langs: [['Английский', 'B2']], laptop: true },
+  i10: { metro: 'Юго-Западная', areas: ['ЗАО'], license: 'B', car: false, med: false, selfEmp: false, langs: [['Английский', 'B1']], laptop: true },
+};
+STUDENTS.forEach(s => Object.assign(s, EXTRA[s.id]));
+
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+const engLevel = s => { const e = s.langs.find(l => l[0] === 'Английский'); return e ? LEVELS.indexOf(e[1]) : -1; };
+// Требования и фильтры: i — иконка, h — оттенок, n — как называется в вакансии, f — подпись фильтра
+const REQS = {
+  med:     { i: '🩺', h: 350, n: 'медкнижка', f: 'Есть медкнижка', test: s => s.med, yes: () => 'медкнижка', no: () => 'нет медкнижки' },
+  license: { i: '🚗', h: 25, n: 'права', f: 'Есть права', test: s => !!s.license, yes: s => 'права ' + s.license, no: () => 'нет прав' },
+  car:     { i: '🚙', h: 45, n: 'своя машина', f: 'Своя машина', test: s => s.car, yes: () => 'своя машина', no: () => 'нет машины' },
+  self:    { i: '🧾', h: 160, n: 'самозанятость', f: 'Самозанятый', test: s => s.selfEmp, yes: () => 'самозанятый', no: () => 'не самозанятый' },
+  laptop:  { i: '💻', h: 205, n: 'свой ноутбук', f: 'Свой ноутбук', test: s => s.laptop, yes: () => 'свой ноутбук', no: () => 'нет ноутбука' },
+  eng:     { i: '🗣️', h: 265, n: 'английский от B1', f: 'Английский от B1', test: s => engLevel(s) >= 2,
+             yes: s => 'английский ' + LEVELS[engLevel(s)], no: s => engLevel(s) >= 0 ? 'английский ' + LEVELS[engLevel(s)] : 'нет английского' },
+  area:    { i: '📍', h: 180, n: 'район', f: 'Готов работать в округе вакансии', test: (s, v) => s.areas.includes(v.okrug),
+             yes: (s, v) => 'готов(а) в ' + v.okrug, no: s => 'работает в ' + s.areas.join(', ') },
+};
+
 const MIN_PUBLIC_TEXTS = 3; // текст отзывов публичен не раньше третьего
 
 // ---------- Состояние ----------
-const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0 };
+const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set() };
 const key = (vacId, sid) => vacId + ':' + sid;
 const vac = () => VACANCIES.find(v => v.id === state.vacId);
 const byId = id => STUDENTS.find(s => s.id === id);
@@ -358,16 +446,34 @@ function fit(s, v) {
   const flex = s.schedule.includes('Гибкий');
   const schedHit = v.schedule.filter(x => flex || x === 'Гибкий' || s.schedule.includes(x)).length;
   const skillHit = v.skills.filter(x => s.skills.includes(x)).length;
-  const score = 0.5 * schedHit / v.schedule.length + 0.3 * skillHit / v.skills.length + 0.2 * s.completeness / 100;
-  return { schedHit, schedTotal: v.schedule.length, skillHit, skillTotal: v.skills.length, score };
+  const reqs = reqList(s, v);
+  const reqHit = reqs.filter(r => r.has).length;
+  const score = 0.4 * schedHit / v.schedule.length + 0.25 * skillHit / v.skills.length
+    + 0.2 * (reqs.length ? reqHit / reqs.length : 1) + 0.15 * s.completeness / 100;
+  return { schedHit, schedTotal: v.schedule.length, skillHit, skillTotal: v.skills.length, reqs, reqHit, reqTotal: reqs.length, score };
+}
+// Требования вакансии + для офлайна — готов ли работать в её округе
+function reqList(s, v) {
+  const list = v.req.map(r => ({ k: r.k, must: r.must, has: REQS[r.k].test(s, v) }));
+  if (v.format === 'Офлайн') list.push({ k: 'area', must: false, has: REQS.area.test(s, v) });
+  return list;
+}
+const filterKeys = v => ['med', 'license', 'car', 'self', 'laptop', 'eng'].concat(v.format === 'Офлайн' ? ['area'] : []);
+const passFilters = (s, v, filters = state.filters) =>
+  [...filters].every(k => !filterKeys(v).includes(k) || REQS[k].test(s, v));
+// Все подходящие по формату, по порядку правил; pass — проходит ли фильтры HR
+function candidates(filters) {
+  const v = vac();
+  return STUDENTS
+    .map(s => ({ s, f: fit(s, v) }))
+    .filter(x => x.f)
+    .map(x => ({ ...x, pass: passFilters(x.s, v, filters) }))
+    .sort((a, b) => b.f.score - a.f.score);
 }
 
 function queue() {
   const v = vac();
-  return STUDENTS
-    .map(s => ({ s, f: fit(s, v) }))
-    .filter(x => x.f && !state.decisions[key(v.id, x.s.id)])
-    .sort((a, b) => b.f.score - a.f.score);
+  return candidates().filter(x => x.pass && !state.decisions[key(v.id, x.s.id)]);
 }
 
 // ---------- Отзывы ----------
@@ -387,6 +493,25 @@ const plural = (n, one, few, many) => {
 const reviewsWord = n => n + ' ' + plural(n, 'отзыв', 'отзыва', 'отзывов');
 const peopleWord = n => plural(n, 'подтвердил', 'подтвердили', 'подтвердили') + ' ' + n + ' ' + plural(n, 'участник', 'участника', 'участников');
 const topSelf = s => CATS.map(c => ({ n: c.n, v: s.self[c.k] })).sort((a, b) => b.v - a.v).slice(0, 2).map(x => x.n);
+// Иконка и оттенок для каждого критерия (график, формат, навыки)
+const CHIPS = {
+  'Утро будни': ['🌅', 28], 'День будни': ['☀️', 48], 'Вечер будни': ['🌙', 245],
+  'Выходные': ['🎉', 330], 'Гибкий': ['🔄', 175],
+  'Офлайн': ['📍', 8], 'Удалённо': ['💻', 205],
+  'Общение с людьми': ['💬', 285], 'Стрессоустойчивость': ['🧘', 155], 'Касса/продажи': ['💳', 38],
+  'Организация': ['📋', 220], 'Тайм-менеджмент': ['⏱️', 0], 'Тексты': ['✍️', 262],
+  'Дизайн': ['🎨', 318], 'Соцсети': ['📱', 192], 'Аналитика': ['📊', 128], 'Excel': ['📈', 100],
+};
+const chip = (label, hit) => {
+  const [icon, h] = CHIPS[label] || ['•', 250];
+  return `<span class="chip c${hit ? ' hit' : ''}" style="--h:${h}"><span class="ci">${icon}</span>${label}</span>`;
+};
+const metroChip = s => `<span class="chip c" style="--h:215"><span class="ci">🚇</span>м. ${s.metro}</span>`;
+// Требование вакансии: есть — с галочкой, нет — пунктиром и словами «нет …»
+const reqChip = (s, v, r) => {
+  const R = REQS[r.k];
+  return `<span class="chip c ${r.has ? 'hit' : 'miss'}" style="--h:${R.h}"><span class="ci">${R.i}</span>${r.has ? R.yes(s, v) : R.no(s, v)}</span>`;
+};
 const grad = h => `linear-gradient(135deg, hsl(${h} 70% 58%), hsl(${(h + 40) % 360} 75% 45%))`;
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -400,48 +525,65 @@ function ratingHTML(s) {
 
 // ---------- Карточка ----------
 function cardHTML(s, f, v) {
-  const sched = s.schedule.map(x => `<span class="chip ${x === 'Гибкий' || v.schedule.includes(x) || v.schedule.includes('Гибкий') ? 'hit' : ''}">${x}</span>`).join('');
-  const skills = s.skills.map(x => `<span class="chip ${v.skills.includes(x) ? 'hit' : ''}">${x}</span>`).join('');
+  const sched = s.schedule.map(x => chip(x, x === 'Гибкий' || v.schedule.includes(x) || v.schedule.includes('Гибкий'))).join('');
+  const skills = s.skills.map(x => chip(x, v.skills.includes(x))).join('');
   const e = s.exp[0];
   return `
     <div class="hero" style="background:${grad(s.hue)}">
-      <span class="fitbadge">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal}</span>
+      <span class="fitbadge">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal} · требования ${f.reqHit}/${f.reqTotal}</span>
       <span class="initials">${s.name[0]}</span>
       <div><h2>${s.name}, ${s.age}</h2><div class="sub">${s.uni}</div></div>
       <span class="stamp like">ИНТЕРЕСНО</span><span class="stamp nope">НЕТ</span>
     </div>
     <div class="body">
       ${ratingHTML(s)}
-      <div class="row">${sched}</div>
-      <div class="row">${skills}</div>
+      <div class="row">${sched}${skills}</div>
+      <div class="row">${metroChip(s)}${f.reqs.map(r => reqChip(s, v, r)).join('')}</div>
       <div><div class="lbl">Опыт</div>
         <div class="exp-line"><b>${e.r}</b> — ${e.t} ${e.c ? `<span class="ok">✓ ${e.c}</span>` : ''}</div></div>
       <div><div class="lbl">Сильные стороны <span class="tag-self">самооценка</span></div>
         <div class="exp-line">${topSelf(s).join(' · ')}</div></div>
-      <div class="more">Нажмите, чтобы открыть профиль →</div>
     </div>`;
 }
 
 // ---------- Колода и свайп ----------
 const deckEl = document.getElementById('deck');
 
+// Шапка вакансии + текущий режим (свайпы или список)
+function renderFeed() {
+  const v = vac();
+  const where = v.format === 'Офлайн' ? `м. ${v.metro} (${v.okrug})` : 'удалённо';
+  document.getElementById('vacMeta').textContent = `${where} · ${v.schedule.join(', ')} · ${v.pay}`;
+  document.getElementById('vacReq').textContent = 'Нужно: ' + v.req.map(r => `${REQS[r.k].i} ${REQS[r.k].n}${r.must ? ' (обязательно)' : ''}`).join(', ');
+  const swipe = state.view === 'swipe';
+  deckEl.hidden = !swipe;
+  document.getElementById('feedActions').hidden = !swipe;
+  document.getElementById('list').hidden = swipe;
+  document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
+  const n = [...state.filters].filter(k => filterKeys(v).includes(k)).length;
+  const fb = document.getElementById('filterBtn');
+  fb.textContent = n ? `Фильтры · ${n}` : 'Фильтры';
+  fb.classList.toggle('active', n > 0);
+  if (swipe) renderDeck(); else renderList();
+}
+
 function renderDeck() {
   const v = vac();
-  document.getElementById('vacMeta').textContent = `${v.employer} · ${v.format} · ${v.schedule.join(', ')} · ${v.pay}`;
   const q = queue();
   deckEl.innerHTML = '';
   document.getElementById('feedActions').style.visibility = q.length ? 'visible' : 'hidden';
   if (!q.length) {
     const liked = STUDENTS.filter(s => state.decisions[key(v.id, s.id)] === 'like').length;
     const hidden = STUDENTS.filter(s => !fit(s, v)).length;
+    const filtered = candidates().filter(x => !x.pass).length;
     const m = state.matches.filter(x => x.vacId === v.id).length;
     deckEl.innerHTML = `<div class="empty">
       <div class="big">🎉</div><h3 style="margin:0">Кандидаты закончились</h3>
-      <p class="muted" style="margin:0">Интересно: ${liked} · мэтчей: ${m}<br>Не подошли по формату работы (${v.format}): ${hidden}</p>
+      <p class="muted" style="margin:0">Интересно: ${liked} · мэтчей: ${m}<br>Не подошли по формату работы (${v.format}): ${hidden}${filtered ? `<br>Скрыто фильтрами: ${filtered}` : ''}</p>
       <button class="btn primary" id="restart">Посмотреть заново</button></div>`;
     document.getElementById('restart').onclick = () => {
       STUDENTS.forEach(s => { if (!state.matches.some(x => x.vacId === v.id && x.sid === s.id)) delete state.decisions[key(v.id, s.id)]; });
-      renderDeck();
+      renderFeed();
     };
     return;
   }
@@ -482,16 +624,75 @@ function attachDrag(el) {
   el.addEventListener('pointercancel', end);
 }
 
+// ---------- Список ----------
+const listEl = document.getElementById('list');
+
+function renderList() {
+  const v = vac();
+  const all = candidates(), shown = all.filter(x => x.pass);
+  const hiddenFormat = STUDENTS.length - all.length, hiddenFilters = all.length - shown.length;
+  listEl.innerHTML = `<div class="small muted">Кандидатов: ${shown.length}${hiddenFilters ? ` · скрыто фильтрами: ${hiddenFilters}` : ''} · не подходят по формату: ${hiddenFormat}</div>`
+    + shown.map(({ s, f }) => {
+      const d = state.decisions[key(v.id, s.id)];
+      const matched = state.matches.some(m => m.vacId === v.id && m.sid === s.id);
+      const st = stats(s);
+      const status = matched ? '<span><span class="status ok-s">🤝 мэтч</span></span>'
+        : d === 'like' ? '<span><span class="status">✓ отклик отправлен</span></span>'
+        : d === 'nope' ? '<span><span class="status">пропущен</span></span>' : '';
+      const icons = f.reqs.map(r => `<span class="${r.has ? '' : 'miss-i'}" title="${r.has ? REQS[r.k].yes(s, v) : REQS[r.k].no(s, v)}">${REQS[r.k].i}</span>`).join(' ');
+      const btns = d === 'nope' ? `<button class="mini" data-undo="${s.id}" aria-label="Вернуть">↺</button>`
+        : d ? '' : `<div class="lbtns"><button class="mini nope" data-nope="${s.id}" aria-label="Пропустить">✕</button><button class="mini like" data-like="${s.id}" aria-label="Интересно">✓</button></div>`;
+      return `<div class="lrow ${d === 'nope' ? 'skipped' : ''}" data-sid="${s.id}">
+        <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
+        <div class="grow">
+          <div class="name">${s.name}, ${s.age} <span class="small muted">· ${st.n ? `👍 ${st.rec}%` : 'новичок'}</span></div>
+          <div class="small muted">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal} · треб. ${f.reqHit}/${f.reqTotal}</div>
+          <div class="icons">🚇 ${s.metro} · ${icons}</div>
+          ${status}
+        </div>${btns}</div>`;
+    }).join('');
+  listEl.querySelectorAll('.lrow').forEach(row => row.onclick = e => {
+    const b = e.target.closest('button');
+    if (!b) return openProfile(row.dataset.sid);
+    if (b.dataset.like) decide('like', b.dataset.like);
+    if (b.dataset.nope) decide('nope', b.dataset.nope);
+    if (b.dataset.undo) { delete state.decisions[key(v.id, b.dataset.undo)]; renderFeed(); }
+  });
+}
+
+// ---------- Фильтры ----------
+function openFilters() {
+  const v = vac();
+  const pending = new Set(state.filters);
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>Фильтры</h3>
+    <p class="small muted" style="margin:0">Показывать только тех, у кого есть:</p>
+    ${filterKeys(v).map(k => `<label class="trow"><span>${REQS[k].i} ${REQS[k].f}${k === 'area' ? ` (${v.okrug})` : ''}</span>
+      <input type="checkbox" data-f="${k}" ${pending.has(k) ? 'checked' : ''}></label>`).join('')}
+    <p class="small muted" style="margin:0">Данные указывает студент. Права и медкнижку проверяете при выходе на работу.</p>
+    <button class="btn primary wide" id="fApply"></button>
+    <button class="btn wide" id="fReset">Сбросить фильтры</button></div>`;
+  modal.hidden = false;
+  const btn = document.getElementById('fApply');
+  const count = () => { btn.textContent = `Показать (${candidates(pending).filter(x => x.pass).length})`; };
+  modal.querySelectorAll('[data-f]').forEach(cb => cb.onchange = () => { cb.checked ? pending.add(cb.dataset.f) : pending.delete(cb.dataset.f); count(); });
+  count();
+  btn.onclick = () => { state.filters = pending; closeModal(); renderFeed(); };
+  document.getElementById('fReset').onclick = () => { state.filters = new Set(); closeModal(); renderFeed(); };
+  modal.onclick = e => { if (e.target === modal) closeModal(); };
+}
+
 function decide(dir, sid) {
   const v = vac();
-  const el = topCard();
+  const el = state.view === 'swipe' ? topCard() : null;
   sid = sid || (el && el.dataset.sid);
   if (!sid) return;
   haptic('tap');
   state.decisions[key(v.id, sid)] = dir;
   const s = byId(sid);
   const done = () => {
-    renderDeck();
+    renderFeed();
     if (dir !== 'like') return;
     if (s.likes.includes(v.id)) {
       state.matches.unshift({ vacId: v.id, sid });
@@ -520,6 +721,13 @@ const isMatched = sid => state.matches.some(m => m.sid === sid);
 function openProfile(sid) {
   const s = byId(sid), v = vac(), f = fit(s, v), st = stats(s);
   const decided = state.decisions[key(v.id, sid)];
+  // Строка «Практичного»; если вакансии это нужно — пометка ✓ или «требуется»
+  const fact = (icon, label, value, reqKey) => {
+    const r = f && reqKey && f.reqs.find(x => x.k === reqKey);
+    const mark = !r ? '' : r.has ? ' <span class="ok">✓ нужно для вакансии</span>'
+      : ` <span class="need">${r.must ? 'обязательно' : 'желательно'} для вакансии</span>`;
+    return `<div class="fact"><span class="fk">${icon} ${label}</span><span>${value}${mark}</span></div>`;
+  };
   const bars = CATS.map(c => {
     const self = s.self[c.k], peer = st.n ? st.per[c.k] : null;
     let diff = '';
@@ -554,12 +762,29 @@ function openProfile(sid) {
     </div>
     <div class="page">
       ${f ? `<div class="panel why"><div class="lbl">Почему в ленте на этом месте</div>
-        <p>График: ${f.schedHit} из ${f.schedTotal} · Навыки: ${f.skillHit} из ${f.skillTotal} · Профиль заполнен на ${s.completeness}%</p>
+        <p>График: ${f.schedHit} из ${f.schedTotal} · Навыки: ${f.skillHit} из ${f.skillTotal} · Требования: ${f.reqHit} из ${f.reqTotal} · Профиль заполнен на ${s.completeness}%</p>
         <p class="small muted">Сортировка по понятным правилам, а не «ИИ-подбор».</p></div>` : ''}
 
       <div class="panel"><h3>Доступность</h3>
-        <div class="row">${s.schedule.map(x => `<span class="chip">${x}</span>`).join('')}${s.format.map(x => `<span class="chip">${x}</span>`).join('')}</div>
+        <div class="row">${s.schedule.map(x => chip(x)).join('')}${s.format.map(x => chip(x)).join('')}</div>
         <p class="small muted">Желаемая оплата: ${s.pay}</p></div>
+
+      <div class="panel"><h3>Навыки</h3>
+        <div class="row">${s.skills.map(x => chip(x, v.skills.includes(x))).join('')}</div>
+        <p class="small muted">✓ — совпадает с требованиями вакансии «${v.title}»</p></div>
+
+      <div class="panel"><h3>Практичное</h3>
+        <div class="facts">
+          ${fact('🚇', 'Метро', 'м. ' + s.metro)}
+          ${fact('📍', 'Готов(а) работать', s.areas.join(', '), 'area')}
+          ${fact('🚗', 'Права', s.license ? 'категория ' + s.license : 'нет', 'license')}
+          ${fact('🚙', 'Своя машина', s.car ? 'есть' : 'нет', 'car')}
+          ${fact('🩺', 'Медкнижка', s.med ? 'есть' : 'нет', 'med')}
+          ${fact('🧾', 'Самозанятость', s.selfEmp ? 'оформлена' : 'нет', 'self')}
+          ${fact('🗣️', 'Языки', s.langs.length ? s.langs.map(l => l[0] + ' ' + l[1]).join(', ') : 'не указаны', 'eng')}
+          ${fact('💻', 'Свой ноутбук', s.laptop ? 'есть' : 'нет', 'laptop')}
+        </div>
+        <p class="small muted">Указано студентом. Права и медкнижку работодатель проверяет при выходе на работу.</p></div>
 
       <div class="panel"><h3>Опыт</h3>
         ${s.exp.map(e => `<div class="mrow"><div class="grow"><div class="name">${e.r}</div><div class="small muted">${e.t}</div></div>
@@ -678,12 +903,13 @@ function renderAbout() {
       <li>Отзыв оставляет только работодатель после подтверждённого мэтча.</li>
       <li>Текст отзывов публичен не раньше третьего отзыва; доля «наняли бы снова» видна сразу.</li>
       <li>Тест на сильные стороны — самооценка, а не психодиагностика. Рядом всегда оценки из отзывов.</li>
-      <li>Порядок в ленте — по понятным правилам (график, навыки, заполненность), не ИИ.</li>
+      <li>Порядок в ленте — по понятным правилам (график, навыки, требования вакансии, заполненность), не ИИ.</li>
+      <li>Практичное (метро, права, медкнижка, самозанятость) указывает студент; документы проверяются при выходе на работу.</li>
       <li>Профили и отзывы проходят ручную модерацию.</li></ul></div>
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
   document.getElementById('resetDemo').onclick = () => {
     state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
-    updateBadge(); renderDeck(); toast('Демо сброшено');
+    state.filters = new Set(); updateBadge(); renderFeed(); toast('Демо сброшено');
   };
 }
 
@@ -699,7 +925,9 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
 
 const sel = document.getElementById('vacSelect');
 sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${v.employer}: ${v.title}</option>`).join('');
-sel.onchange = () => { state.vacId = sel.value; renderDeck(); };
+sel.onchange = () => { state.vacId = sel.value; renderFeed(); };
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { state.view = b.dataset.view; haptic('tap'); renderFeed(); });
+document.getElementById('filterBtn').onclick = openFilters;
 
 let toastTimer;
 function toast(msg) {
@@ -709,7 +937,7 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.remove(), 3200);
 }
 
-renderDeck();
+renderFeed();
 </script>
 </body>
 </html>
