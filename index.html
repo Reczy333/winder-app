@@ -5,33 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>Winder — демо</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f4f3f8; --surface: #ffffff; --surface-2: #f7f6fb; --text: #16151c; --muted: #6b6878;
-  --line: #e6e4ee; --accent: #6c4cf5; --accent-soft: #efeafe; --on-accent: #ffffff;
-  --like: #1a9b5c; --like-soft: #e3f6ec; --nope: #e5484d; --nope-soft: #fde8e9;
-  --star: #f5a524; --self: #b9aef8; --peer: #6c4cf5; --shadow: 0 10px 30px rgba(30, 20, 70, .12);
+  /* Сдержанный премиум: тёплый нейтральный фон, один акцент, мягкие многослойные тени */
+  --bg: #f5f4f1; --surface: #ffffff; --surface-2: #f3f2ee; --text: #111114; --muted: #6e6d75;
+  --line: #e8e6e1; --accent: #5b4cff; --accent-2: #8a5cff; --accent-soft: #eeecff; --on-accent: #ffffff;
+  --like: #14a05a; --like-soft: #e4f5eb; --nope: #e5484d; --nope-soft: #fdeaea;
+  --star: #f5a524; --self: #c4bcff; --peer: #5b4cff;
+  --shadow: 0 1px 2px rgba(17, 17, 20, .04), 0 8px 24px rgba(17, 17, 20, .08);
+  --shadow-lg: 0 2px 6px rgba(17, 17, 20, .05), 0 24px 48px -12px rgba(40, 30, 110, .22);
+  --glass: rgba(255, 255, 255, .72);
+  --font: "Manrope", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f0e14; --surface: #1b1a23; --surface-2: #23222c; --text: #f2f1f7; --muted: #9a97a8;
-    --line: #2d2b38; --accent: #9b85ff; --accent-soft: #2a2445; --on-accent: #120d26;
-    --like: #3ccf87; --like-soft: #143425; --nope: #ff6b6f; --nope-soft: #3a1a1c;
-    --self: #4d4387; --peer: #9b85ff; --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+    --bg: #0b0b0f; --surface: #15151b; --surface-2: #1c1c24; --text: #f4f4f6; --muted: #8e8e9a;
+    --line: #26262f; --accent: #8b80ff; --accent-2: #b08bff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
+    --like: #3fd08a; --like-soft: #11291d; --nope: #ff6b6f; --nope-soft: #331617;
+    --self: #3f3a73; --peer: #8b80ff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+    --shadow-lg: 0 2px 6px rgba(0, 0, 0, .4), 0 24px 48px -12px rgba(0, 0, 0, .7);
+    --glass: rgba(21, 21, 27, .72);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f0e14; --surface: #1b1a23; --surface-2: #23222c; --text: #f2f1f7; --muted: #9a97a8;
-  --line: #2d2b38; --accent: #9b85ff; --accent-soft: #2a2445; --on-accent: #120d26;
-  --like: #3ccf87; --like-soft: #143425; --nope: #ff6b6f; --nope-soft: #3a1a1c;
-  --self: #4d4387; --peer: #9b85ff; --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  --bg: #0b0b0f; --surface: #15151b; --surface-2: #1c1c24; --text: #f4f4f6; --muted: #8e8e9a;
+  --line: #26262f; --accent: #8b80ff; --accent-2: #b08bff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
+  --like: #3fd08a; --like-soft: #11291d; --nope: #ff6b6f; --nope-soft: #331617;
+  --self: #3f3a73; --peer: #8b80ff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, .4), 0 24px 48px -12px rgba(0, 0, 0, .7);
+  --glass: rgba(21, 21, 27, .72);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; }
 body {
   background: var(--bg); color: var(--text);
-  font: 15px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  font: 15px/1.45 var(--font); -webkit-font-smoothing: antialiased; letter-spacing: -.005em;
   overscroll-behavior: none;
 }
 button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
@@ -213,6 +227,139 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
 .trow { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font-size: 14px; }
 .trow input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; }
 
+/* формы: своя вакансия и вопрос об оплате */
+.inp { width: 100%; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font: inherit; padding: 10px 12px; }
+.fl { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.pickc { cursor: pointer; }
+.pickc:not(.on) { opacity: .4; filter: grayscale(.7); }
+.req-row { display: flex; align-items: center; gap: 10px; }
+.req-row > span { flex: 1; font-size: 13px; }
+.req-row .scale { flex: 0 0 66%; }
+.req-row .scale button { font-size: 11px; padding: 7px 0; }
+.opt { text-align: left; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; }
+.opt.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* итог показа (для интервьюера) */
+.logo { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: default; }
+.sum-row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.sum-row span:first-child { color: var(--muted); }
+.sec-bar { display: grid; grid-template-columns: 120px 1fr 44px; gap: 8px; align-items: center; font-size: 13px; }
+.sec-bar .bar > i { background: var(--accent); }
+details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.tl { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
+
+/* ===================== Дизайн v4: сдержанный премиум (слой поверх базовых стилей) ===================== */
+.ico { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* шапка: стекло с размытием */
+.top { position: relative; z-index: 5; padding: 14px 16px 10px; background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px); }
+.logo { font-weight: 800; font-size: 23px; letter-spacing: -.045em; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pill { font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 3px 8px; }
+.brand .who { font-weight: 500; }
+.vac { border: 0; border-radius: 18px; padding: 11px 14px; box-shadow: var(--shadow); }
+.vac-label { text-transform: uppercase; letter-spacing: .09em; font-size: 10px; font-weight: 700; }
+.vac select { font-size: 16px; font-weight: 700; letter-spacing: -.015em; }
+.seg { border: 0; background: var(--surface-2); border-radius: 14px; padding: 4px; }
+.seg button { display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; padding: 8px 0; transition: background .2s, color .2s, box-shadow .2s; }
+.seg button .ico, .fbtn .ico { width: 17px; height: 17px; }
+.seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.fbtn { display: flex; align-items: center; gap: 6px; border: 0; background: var(--surface-2); border-radius: 14px; transition: background .2s, color .2s; }
+.fbtn.active { background: var(--accent-soft); color: var(--accent); }
+
+/* карточка: глубокая тень, мягкие градиенты с зерном, пружинистый возврат */
+.card { border-radius: 28px; box-shadow: var(--shadow-lg); transition: transform .5s cubic-bezier(.2, .9, .25, 1.15), opacity .3s ease; }
+.card.behind { transform: scale(.94) translateY(14px); opacity: 1; filter: brightness(.97); transition: transform .35s cubic-bezier(.2, .9, .25, 1.1); }
+.hero { overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: 0; opacity: .22; mix-blend-mode: overlay; pointer-events: none;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, .3)); pointer-events: none; }
+.hero > div { position: relative; z-index: 1; }
+.hero .fitbadge, .hero .stamp, .hero .initials, .hero .close, .hero .handle { z-index: 2; }
+.hero h2 { font-size: 27px; font-weight: 800; letter-spacing: -.035em; }
+.hero .sub { font-weight: 500; }
+.hero .initials { font-weight: 800; letter-spacing: -.05em; }
+.hero .fitbadge { background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .26); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-weight: 600; letter-spacing: .01em; padding: 5px 10px; }
+.stamp { border: 0; border-radius: 99px; padding: 7px 14px; font-size: 12px; font-weight: 800; letter-spacing: .08em; color: #fff; box-shadow: 0 8px 22px rgba(0, 0, 0, .25); }
+.stamp.like { color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.stamp.nope { color: #fff; background: var(--nope); }
+.rating b { font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+.lbl { letter-spacing: .09em; font-size: 10px; font-weight: 700; }
+.exp-line b { font-weight: 700; }
+
+/* чипы: приглушённые оттенки вместо радуги */
+.chip { border-radius: 10px; font-weight: 500; }
+.chip.c { background: hsl(var(--h) 45% 96%); border-color: transparent; color: hsl(var(--h) 28% 30%); }
+.chip.hit { border-color: hsl(var(--h) 40% 72%); font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chip.c { background: hsl(var(--h) 16% 16%); border-color: transparent; color: hsl(var(--h) 35% 80%); }
+  :root:not([data-theme="light"]) .chip.hit { border-color: hsl(var(--h) 30% 42%); }
+}
+:root[data-theme="dark"] .chip.c { background: hsl(var(--h) 16% 16%); border-color: transparent; color: hsl(var(--h) 35% 80%); }
+:root[data-theme="dark"] .chip.hit { border-color: hsl(var(--h) 30% 42%); }
+
+/* кнопки действий */
+.actions { gap: 22px; padding: 14px 16px 4px; }
+.btn-round { width: 64px; height: 64px; background: var(--surface); box-shadow: var(--shadow-lg); transition: transform .25s cubic-bezier(.2, .9, .25, 1.4); }
+.btn-round .ico { width: 28px; height: 28px; stroke-width: 2.4; }
+.btn-round.like { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+.btn-round.info { width: 48px; height: 48px; }
+.btn-round.info .ico { width: 22px; height: 22px; stroke-width: 2; }
+.btn-round:active { transform: scale(.88); }
+.rule-note { font-size: 10.5px; opacity: .85; }
+
+/* таббар: стекло */
+.tabs { background: var(--glass); -webkit-backdrop-filter: saturate(1.4) blur(18px); backdrop-filter: saturate(1.4) blur(18px); border-top: 1px solid var(--line); }
+.tabs button { gap: 3px; font-weight: 600; font-size: 11px; transition: color .2s; }
+.tabs button .ico { width: 23px; height: 23px; }
+.tabs button.on .ico { stroke-width: 2.2; }
+
+/* панели, списки, профиль */
+.panel { border: 0; box-shadow: var(--shadow); border-radius: 20px; padding: 16px; }
+.panel h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 700; }
+.panel.why { box-shadow: none; }
+.lrow { border: 0; box-shadow: var(--shadow); border-radius: 20px; transition: transform .15s; }
+.lrow:active { transform: scale(.985); }
+.lrow .name { font-weight: 700; letter-spacing: -.01em; }
+.mini .ico { width: 18px; height: 18px; stroke-width: 2.3; }
+.mini.like { background: var(--accent-soft); color: var(--accent); }
+.ava { font-weight: 800; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
+.sheet .hero { height: 230px; border-radius: 0 0 28px 28px; }
+.sheet .hero .handle { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .55); }
+.close { background: rgba(255, 255, 255, .16); border: 1px solid rgba(255, 255, 255, .26); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); display: grid; place-items: center; }
+.close .ico { width: 16px; height: 16px; stroke-width: 2.4; }
+.bar { height: 8px; }
+.status { border-radius: 8px; font-weight: 600; }
+.empty { border-radius: 28px; box-shadow: var(--shadow-lg); }
+
+/* мэтч: подсветка и «выпрыгивание» */
+.overlay { background: radial-gradient(circle at 50% 38%, rgba(91, 76, 255, .55), rgba(8, 6, 20, .94) 62%); }
+.match-box { animation: pop .55s cubic-bezier(.2, .9, .25, 1.3); }
+@keyframes pop { from { transform: scale(.82); opacity: 0; } }
+.match-box h2 { font-size: 42px; font-weight: 800; letter-spacing: -.045em; background: linear-gradient(135deg, #fff, #d6cfff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.match-avas .ava { border: 0; box-shadow: 0 0 0 4px rgba(255, 255, 255, .92), 0 14px 44px rgba(91, 76, 255, .65); }
+.contact { background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .16); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+/* кнопки, формы, модалки */
+.btn { border-radius: 14px; padding: 12px 16px; font-weight: 700; transition: transform .15s; }
+.btn:active { transform: scale(.98); }
+.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--accent) 70%, transparent); }
+.modal { background: rgba(0, 0, 0, .4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.modal-box { border-radius: 26px 26px 0 0; }
+.modal-box::before { content: ""; align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--line); flex: none; }
+.opt, .trow { border: 0; box-shadow: var(--shadow); }
+.opt.on { box-shadow: 0 0 0 2px var(--accent); }
+.inp:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.scale button { border: 0; background: var(--surface); box-shadow: var(--shadow); }
+.scale button.on { background: var(--accent); color: #fff; }
+.toast { border-radius: 14px; font-weight: 600; }
+/* компоновка под более широкий шрифт: мета вакансии в одну строку, верх карточки ниже */
+.vac-meta, .vac-req { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card .hero { flex: 0 0 24%; min-height: 96px; padding: 14px 16px; }
+.card .body { gap: 7px; padding: 12px 14px 12px; }
+.top { padding-bottom: 8px; gap: 8px; }
+
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -220,7 +367,7 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
 <div id="app">
   <header class="top">
     <div class="brand">
-      <span class="logo">Winder</span>
+      <span class="logo" id="logo">Winder</span>
       <span class="pill">ДЕМО</span>
       <span class="who">вы — работодатель</span>
     </div>
@@ -235,10 +382,10 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
     </label>
     <div class="toolbar">
       <div class="seg" role="tablist">
-        <button data-view="swipe" class="on">🃏 Свайпы</button>
-        <button data-view="list">☰ Список</button>
+        <button data-view="swipe" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Свайпы</button>
+        <button data-view="list"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>Список</button>
       </div>
-      <button class="fbtn" id="filterBtn">Фильтры</button>
+      <button class="fbtn" id="filterBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Фильтры</span></button>
     </div>
   </header>
 
@@ -246,9 +393,9 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
     <section class="screen" id="screen-feed">
       <div class="deck" id="deck"></div>
       <div class="actions" id="feedActions">
-        <button class="btn-round nope" id="btnNope" aria-label="Пропустить">✕</button>
-        <button class="btn-round info" id="btnInfo" aria-label="Открыть профиль">i</button>
-        <button class="btn-round like" id="btnLike" aria-label="Интересно">✓</button>
+        <button class="btn-round nope" id="btnNope" aria-label="Пропустить"><svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+        <button class="btn-round info" id="btnInfo" aria-label="Открыть профиль"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
+        <button class="btn-round like" id="btnLike" aria-label="Интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
       </div>
       <div class="list" id="list" hidden></div>
       <p class="rule-note">Порядок — по правилам: график → навыки → требования → заполненность профиля. Это не ИИ.</p>
@@ -264,9 +411,9 @@ textarea { width: 100%; min-height: 80px; border-radius: 12px; border: 1px solid
   </main>
 
   <nav class="tabs">
-    <button data-tab="feed" class="on"><span class="ic">🃏</span>Кандидаты</button>
-    <button data-tab="matches"><span class="ic">🤝</span>Мэтчи<span class="badge" id="matchBadge" hidden></span></button>
-    <button data-tab="about"><span class="ic">ℹ️</span>Как это работает</button>
+    <button data-tab="feed" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Кандидаты</button>
+    <button data-tab="matches"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>Мэтчи<span class="badge" id="matchBadge" hidden></span></button>
+    <button data-tab="about"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Как это работает</button>
   </nav>
 </div>
 
@@ -418,10 +565,24 @@ const REQS = {
              yes: (s, v) => 'готов(а) в ' + v.okrug, no: s => 'работает в ' + s.areas.join(', ') },
 };
 
+const ICON = {"cards": '<svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>', "list": '<svg class="ico" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>', "filter": '<svg class="ico" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>', "x": '<svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>', "check": '<svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>', "info": '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>', "match": '<svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>', "undo": '<svg class="ico" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>'};
+
 const MIN_PUBLIC_TEXTS = 3; // текст отзывов публичен не раньше третьего
 
 // ---------- Состояние ----------
 const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set() };
+// ---------- Журнал показа: для заметок интервьюера, только в памяти этого устройства ----------
+const LOG = {
+  start: Date.now(), events: [], sections: {}, profiles: {},
+  viewMs: { swipe: 0, list: 0 }, viewSince: Date.now(), viewSwitches: 0, filterOpens: 0, pay: null, customVacs: [],
+};
+const logEv = text => LOG.events.push({ at: Date.now(), text });
+const secs = ms => Math.round(ms / 1000) + ' с';
+const mmss = ms => { const t = Math.round(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+
+// Отвечает ли студент взаимностью: у готовых вакансий — заданный список, у своей — если хорошо подходит по правилам
+const studentLikes = (s, v) => v.custom ? ((fit(s, v) || {}).score || 0) >= 0.5 : s.likes.includes(v.id);
+
 const key = (vacId, sid) => vacId + ':' + sid;
 const vac = () => VACANCIES.find(v => v.id === state.vacId);
 const byId = id => STUDENTS.find(s => s.id === id);
@@ -512,7 +673,7 @@ const reqChip = (s, v, r) => {
   const R = REQS[r.k];
   return `<span class="chip c ${r.has ? 'hit' : 'miss'}" style="--h:${R.h}"><span class="ci">${R.i}</span>${r.has ? R.yes(s, v) : R.no(s, v)}</span>`;
 };
-const grad = h => `linear-gradient(135deg, hsl(${h} 70% 58%), hsl(${(h + 40) % 360} 75% 45%))`;
+const grad = h => `radial-gradient(120% 90% at 0% 0%, hsl(${h} 85% 70%) 0%, transparent 60%), radial-gradient(100% 100% at 100% 100%, hsl(${(h + 55) % 360} 75% 42%) 0%, transparent 65%), linear-gradient(135deg, hsl(${(h + 20) % 360} 68% 56%), hsl(${(h + 40) % 360} 72% 40%))`;
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function ratingHTML(s) {
@@ -552,9 +713,11 @@ const deckEl = document.getElementById('deck');
 // Шапка вакансии + текущий режим (свайпы или список)
 function renderFeed() {
   const v = vac();
-  const where = v.format === 'Офлайн' ? `м. ${v.metro} (${v.okrug})` : 'удалённо';
+  const where = v.format !== 'Офлайн' ? 'удалённо' : v.metro && v.metro !== '—' ? `м. ${v.metro} (${v.okrug})` : v.okrug;
   document.getElementById('vacMeta').textContent = `${where} · ${v.schedule.join(', ')} · ${v.pay}`;
-  document.getElementById('vacReq').textContent = 'Нужно: ' + v.req.map(r => `${REQS[r.k].i} ${REQS[r.k].n}${r.must ? ' (обязательно)' : ''}`).join(', ');
+  document.getElementById('vacReq').textContent = v.req.length
+    ? 'Нужно: ' + v.req.map(r => `${REQS[r.k].i} ${REQS[r.k].n}${r.must ? ' (обязательно)' : ''}`).join(', ')
+    : 'Особых требований нет';
   const swipe = state.view === 'swipe';
   deckEl.hidden = !swipe;
   document.getElementById('feedActions').hidden = !swipe;
@@ -562,7 +725,7 @@ function renderFeed() {
   document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
   const n = [...state.filters].filter(k => filterKeys(v).includes(k)).length;
   const fb = document.getElementById('filterBtn');
-  fb.textContent = n ? `Фильтры · ${n}` : 'Фильтры';
+  fb.querySelector('span').textContent = n ? `Фильтры · ${n}` : 'Фильтры';
   fb.classList.toggle('active', n > 0);
   if (swipe) renderDeck(); else renderList();
 }
@@ -602,6 +765,9 @@ function topCard() { return deckEl.querySelector('.card:not(.behind)'); }
 function attachDrag(el) {
   let sx = 0, sy = 0, dx = 0, dy = 0, down = false;
   const like = el.querySelector('.stamp.like'), nope = el.querySelector('.stamp.nope');
+  const behind = deckEl.querySelector('.card.behind');
+  // следующая карточка «подъезжает» по мере того, как тянешь верхнюю
+  const lift = k => { if (behind) behind.style.transform = k ? `scale(${0.94 + 0.06 * k}) translateY(${14 - 14 * k}px)` : ''; };
   el.addEventListener('pointerdown', e => {
     down = true; sx = e.clientX; sy = e.clientY; dx = dy = 0;
     el.setPointerCapture(e.pointerId); el.classList.add('dragging');
@@ -612,6 +778,8 @@ function attachDrag(el) {
     el.style.transform = `translate(${dx}px, ${dy * 0.25}px) rotate(${dx / 18}deg)`;
     like.style.opacity = Math.max(0, Math.min(1, dx / 90));
     nope.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+    if (behind) behind.style.transition = 'none';
+    lift(Math.min(1, Math.abs(dx) / 140));
   });
   const end = () => {
     if (!down) return;
@@ -619,6 +787,7 @@ function attachDrag(el) {
     if (Math.abs(dx) > 100) { decide(dx > 0 ? 'like' : 'nope'); return; }
     if (Math.abs(dx) < 6 && Math.abs(dy) < 6) openProfile(el.dataset.sid);
     el.style.transform = ''; like.style.opacity = 0; nope.style.opacity = 0;
+    if (behind) behind.style.transition = ''; lift(0);
   };
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', end);
@@ -640,8 +809,8 @@ function renderList() {
         : d === 'like' ? '<span><span class="status">✓ отклик отправлен</span></span>'
         : d === 'nope' ? '<span><span class="status">пропущен</span></span>' : '';
       const icons = f.reqs.map(r => `<span class="${r.has ? '' : 'miss-i'}" title="${r.has ? REQS[r.k].yes(s, v) : REQS[r.k].no(s, v)}">${REQS[r.k].i}</span>`).join(' ');
-      const btns = d === 'nope' ? `<button class="mini" data-undo="${s.id}" aria-label="Вернуть">↺</button>`
-        : d ? '' : `<div class="lbtns"><button class="mini nope" data-nope="${s.id}" aria-label="Пропустить">✕</button><button class="mini like" data-like="${s.id}" aria-label="Интересно">✓</button></div>`;
+      const btns = d === 'nope' ? `<button class="mini" data-undo="${s.id}" aria-label="Вернуть">${ICON.undo}</button>`
+        : d ? '' : `<div class="lbtns"><button class="mini nope" data-nope="${s.id}" aria-label="Пропустить">${ICON.x}</button><button class="mini like" data-like="${s.id}" aria-label="Интересно">${ICON.check}</button></div>`;
       return `<div class="lrow ${d === 'nope' ? 'skipped' : ''}" data-sid="${s.id}">
         <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
         <div class="grow">
@@ -656,13 +825,14 @@ function renderList() {
     if (!b) return openProfile(row.dataset.sid);
     if (b.dataset.like) decide('like', b.dataset.like);
     if (b.dataset.nope) decide('nope', b.dataset.nope);
-    if (b.dataset.undo) { delete state.decisions[key(v.id, b.dataset.undo)]; renderFeed(); }
+    if (b.dataset.undo) { delete state.decisions[key(v.id, b.dataset.undo)]; logEv(`↺ вернул: ${byId(b.dataset.undo).name}`); renderFeed(); }
   });
 }
 
 // ---------- Фильтры ----------
 function openFilters() {
   const v = vac();
+  LOG.filterOpens++;
   const pending = new Set(state.filters);
   modal.className = 'modal';
   modal.innerHTML = `<div class="modal-box">
@@ -678,8 +848,11 @@ function openFilters() {
   const count = () => { btn.textContent = `Показать (${candidates(pending).filter(x => x.pass).length})`; };
   modal.querySelectorAll('[data-f]').forEach(cb => cb.onchange = () => { cb.checked ? pending.add(cb.dataset.f) : pending.delete(cb.dataset.f); count(); });
   count();
-  btn.onclick = () => { state.filters = pending; closeModal(); renderFeed(); };
-  document.getElementById('fReset').onclick = () => { state.filters = new Set(); closeModal(); renderFeed(); };
+  btn.onclick = () => {
+    state.filters = pending; closeModal(); renderFeed();
+    logEv('фильтры: ' + ([...pending].filter(k => filterKeys(v).includes(k)).map(k => REQS[k].f).join(', ') || 'без фильтров'));
+  };
+  document.getElementById('fReset').onclick = () => { state.filters = new Set(); closeModal(); renderFeed(); logEv('фильтры сброшены'); };
   modal.onclick = e => { if (e.target === modal) closeModal(); };
 }
 
@@ -691,12 +864,16 @@ function decide(dir, sid) {
   haptic('tap');
   state.decisions[key(v.id, sid)] = dir;
   const s = byId(sid);
+  logEv(`${dir === 'like' ? '✓ интересно' : '✕ пропустил'}: ${s.name} (${v.title}, ${state.view === 'swipe' ? 'свайпы' : 'список'})`);
   const done = () => {
     renderFeed();
     if (dir !== 'like') return;
-    if (s.likes.includes(v.id)) {
+    if (studentLikes(s, v)) {
       state.matches.unshift({ vacId: v.id, sid });
-      updateBadge(); showMatch(s, v);
+      logEv(`🤝 мэтч: ${s.name}`);
+      updateBadge();
+      // При первом мэтче — вопрос об оплате вместо мгновенных контактов
+      if (!LOG.pay) showPaywall(s, () => showMatch(s, v)); else showMatch(s, v);
     } else {
       toast(`${s.name} увидит вашу вакансию в своей ленте. Если ответит взаимностью — будет мэтч.`);
     }
@@ -756,7 +933,8 @@ function openProfile(sid) {
 
   sheet.innerHTML = `<div class="sheet-inner">
     <div class="hero" style="background:${grad(s.hue)}">
-      <button class="close" id="closeSheet" aria-label="Закрыть">✕</button>
+      <span class="handle"></span>
+      <button class="close" id="closeSheet" aria-label="Закрыть">${ICON.x}</button>
       <span class="initials">${s.name[0]}</span>
       <div><h2>${s.name}, ${s.age}</h2><div class="sub">${s.uni}</div></div>
     </div>
@@ -799,16 +977,43 @@ function openProfile(sid) {
       <div class="panel"><h3>Контакты</h3>${contacts}</div>
     </div></div>
     ${!decided && f ? `<div class="sheet-actions">
-      <button class="btn-round nope" id="sNope" aria-label="Пропустить">✕</button>
-      <button class="btn-round like" id="sLike" aria-label="Интересно">✓</button></div>` : ''}`;
+      <button class="btn-round nope" id="sNope" aria-label="Пропустить">${ICON.x}</button>
+      <button class="btn-round like" id="sLike" aria-label="Интересно">${ICON.check}</button></div>` : ''}`;
   sheet.hidden = false; sheet.scrollTop = 0;
+  trackProfile(s);
   document.getElementById('closeSheet').onclick = closeProfile;
   const sl = document.getElementById('sLike'), sn = document.getElementById('sNope');
   if (sl) sl.onclick = () => { closeProfile(); setTimeout(() => decide('like', sid), 50); };
   if (sn) sn.onclick = () => { closeProfile(); setTimeout(() => decide('nope', sid), 50); };
   if (inTelegram) { tg.BackButton.show(); }
 }
-function closeProfile() { sheet.hidden = true; if (inTelegram) tg.BackButton.hide(); }
+function closeProfile() { stopTracking(); sheet.hidden = true; if (inTelegram) tg.BackButton.hide(); }
+
+// Сколько открыт профиль и сколько секунд на экране был каждый блок (опыт, отзывы, тест…)
+let track = null;
+function trackProfile(s) {
+  stopTracking();
+  const p = LOG.profiles[s.id] || (LOG.profiles[s.id] = { name: s.name, opens: 0, ms: 0 });
+  p.opens++;
+  logEv(`открыл профиль: ${s.name}`);
+  track = { sid: s.id, since: Date.now(), visible: {} };
+  sheet.querySelectorAll('.panel').forEach(el => { el.dataset.sec = el.querySelector('h3') ? el.querySelector('h3').textContent : 'Почему на этом месте'; });
+  // Блок «смотрят», если на экране хотя бы его половина (или 40% экрана для длинных блоков)
+  track.io = new IntersectionObserver(entries => entries.forEach(e => {
+    const name = e.target.dataset.sec, now = Date.now();
+    const seen = e.isIntersecting && e.intersectionRect.height >= Math.min(e.boundingClientRect.height * 0.5, (e.rootBounds ? e.rootBounds.height : innerHeight) * 0.4);
+    if (seen && !track.visible[name]) track.visible[name] = now;
+    if (!seen && track.visible[name]) { LOG.sections[name] = (LOG.sections[name] || 0) + now - track.visible[name]; delete track.visible[name]; }
+  }), { root: sheet, threshold: [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1] });
+  sheet.querySelectorAll('.panel').forEach(el => track.io.observe(el));
+}
+function stopTracking() {
+  if (!track) return;
+  const now = Date.now();
+  Object.entries(track.visible).forEach(([name, t]) => { LOG.sections[name] = (LOG.sections[name] || 0) + now - t; });
+  LOG.profiles[track.sid].ms += now - track.since;
+  track.io.disconnect(); track = null;
+}
 if (inTelegram) tg.BackButton.onClick(() => { if (!document.getElementById('modal').hidden) closeModal(); else closeProfile(); });
 
 // ---------- Мэтч ----------
@@ -884,6 +1089,7 @@ function openReview(k) {
   document.getElementById('revSend').onclick = () => {
     if (Object.keys(vals).length < CATS.length || rec === null) { toast('Поставьте оценку по всем категориям и ответьте, наняли бы снова'); return; }
     state.reviewed[k] = true; closeModal(); renderMatches();
+    logEv(`оставил отзыв: ${s.name} (наняли бы снова: ${rec ? 'да' : 'нет'})`);
     toast('Отзыв отправлен на модерацию. Текст станет публичным, когда у студента будет 3+ отзыва.');
   };
 }
@@ -893,7 +1099,8 @@ function closeModal() { modal.hidden = true; }
 function renderAbout() {
   document.getElementById('aboutPage').innerHTML = `
     <div class="panel"><h3>Что это</h3>
-      <p>Демо-прототип Winder со стороны работодателя. <b>Все студенты, отзывы и контакты вымышленные.</b> Данные никуда не отправляются.</p></div>
+      <p>Демо-прототип Winder со стороны работодателя. <b>Все студенты, отзывы и контакты вымышленные.</b> Данные никуда не отправляются.</p>
+      <p class="small muted">Чтобы интервьюеру не отвлекаться на заметки, демо запоминает ваши нажатия — только на этом устройстве и только до закрытия.</p></div>
     <div class="panel"><h3>Как работает</h3><ul class="rules">
       <li>Вы листаете профили студентов под вашу вакансию: вправо — интересно, влево — нет.</li>
       <li>Если студент тоже отметил вашу вакансию — мэтч, и обеим сторонам открываются контакты.</li>
@@ -920,13 +1127,212 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   ['feed', 'matches', 'about'].forEach(t => document.getElementById('screen-' + t).hidden = t !== state.tab);
   if (state.tab === 'matches') { state.seenMatches = state.matches.length; updateBadge(); renderMatches(); }
   if (state.tab === 'about') renderAbout();
+  logEv('вкладка: ' + b.textContent.trim());
   haptic('tap');
 });
 
 const sel = document.getElementById('vacSelect');
-sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${v.employer}: ${v.title}</option>`).join('');
-sel.onchange = () => { state.vacId = sel.value; renderFeed(); };
-document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { state.view = b.dataset.view; haptic('tap'); renderFeed(); });
+function buildVacSelect() {
+  sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${esc(v.employer)}: ${esc(v.title)}</option>`).join('')
+    + '<option value="__new">＋ Своя вакансия…</option>';
+  sel.value = state.vacId;
+}
+buildVacSelect();
+sel.onchange = () => {
+  if (sel.value === '__new') { sel.value = state.vacId; openVacancyForm(); return; }
+  state.vacId = sel.value; renderFeed();
+  logEv('вакансия: ' + vac().title);
+};
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
+  if (state.view === b.dataset.view) return;
+  const now = Date.now();
+  LOG.viewMs[state.view] += now - LOG.viewSince; LOG.viewSince = now; LOG.viewSwitches++;
+  state.view = b.dataset.view; haptic('tap'); renderFeed();
+  logEv('режим: ' + (state.view === 'swipe' ? 'свайпы' : 'список'));
+});
+
+// ---------- Своя вакансия ----------
+const OKRUGS = ['ЦАО', 'САО', 'СВАО', 'ВАО', 'ЮВАО', 'ЮАО', 'ЮЗАО', 'ЗАО', 'СЗАО', 'Зеленоград', 'Новая Москва'];
+const SCHEDULES = ['Утро будни', 'День будни', 'Вечер будни', 'Выходные', 'Гибкий'];
+const SKILLS = ['Общение с людьми', 'Стрессоустойчивость', 'Касса/продажи', 'Организация', 'Тайм-менеджмент', 'Тексты', 'Дизайн', 'Соцсети', 'Аналитика', 'Excel'];
+const REQ_KEYS = ['med', 'license', 'car', 'self', 'laptop', 'eng'];
+
+function openVacancyForm() {
+  const f = { format: 'Офлайн', schedule: new Set(), skills: new Set(), req: {} };
+  const pick = (list, group) => list.map(x => { const [i, h] = CHIPS[x]; return `<button type="button" class="chip c pickc" data-g="${group}" data-v="${x}" style="--h:${h}"><span class="ci">${i}</span>${x}</button>`; }).join('');
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>Своя вакансия</h3>
+    <p class="small muted" style="margin:0">Заполните как для реального найма — лента пересортируется под вашу вакансию.</p>
+    <div><div class="fl">Должность *</div><input class="inp" id="vfTitle" maxlength="60" placeholder="Кого ищете"></div>
+    <div><div class="fl">Кто вы</div><input class="inp" id="vfWho" maxlength="40" placeholder="Пекарня, студия, магазин…"></div>
+    <div><div class="fl">Формат</div><div class="scale" id="vfFormat"><button type="button" data-v="Офлайн" class="on">📍 Офлайн</button><button type="button" data-v="Удалённо">💻 Удалённо</button></div></div>
+    <div id="vfWhere" style="display:flex;gap:8px">
+      <div style="flex:1"><div class="fl">Округ</div><select class="inp" id="vfOkrug">${OKRUGS.map(o => `<option>${o}</option>`).join('')}</select></div>
+      <div style="flex:1"><div class="fl">Метро</div><input class="inp" id="vfMetro" maxlength="30" placeholder="Станция"></div>
+    </div>
+    <div><div class="fl">График * <span class="muted small">— можно несколько</span></div><div class="row">${pick(SCHEDULES, 'schedule')}</div></div>
+    <div><div class="fl">Навыки * <span class="muted small">— что важно</span></div><div class="row">${pick(SKILLS, 'skills')}</div></div>
+    <div><div class="fl">Требования</div><div style="display:flex;flex-direction:column;gap:8px">
+      ${REQ_KEYS.map(k => `<div class="req-row"><span>${REQS[k].i} ${REQS[k].n}</span>
+        <div class="scale" data-req="${k}"><button type="button" data-v="" class="on">не важно</button><button type="button" data-v="nice">желательно</button><button type="button" data-v="must">обязательно</button></div></div>`).join('')}
+    </div></div>
+    <div><div class="fl">Оплата</div><input class="inp" id="vfPay" maxlength="30" placeholder="Ставка или оклад"></div>
+    <button class="btn primary wide" id="vfSave">Показать кандидатов</button>
+    <button class="btn wide" id="vfCancel">Отмена</button></div>`;
+  modal.hidden = false;
+  const one = (box, btn) => { box.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === btn)); };
+  modal.querySelectorAll('#vfFormat button').forEach(b => b.onclick = () => {
+    one(b.parentElement, b); f.format = b.dataset.v;
+    document.getElementById('vfWhere').style.display = f.format === 'Офлайн' ? 'flex' : 'none';
+  });
+  modal.querySelectorAll('.pickc').forEach(b => b.onclick = () => {
+    const set = f[b.dataset.g];
+    set.has(b.dataset.v) ? set.delete(b.dataset.v) : set.add(b.dataset.v);
+    b.classList.toggle('on', set.has(b.dataset.v));
+  });
+  modal.querySelectorAll('[data-req]').forEach(box => box.querySelectorAll('button').forEach(b => b.onclick = () => { one(box, b); f.req[box.dataset.req] = b.dataset.v; }));
+  document.getElementById('vfCancel').onclick = closeModal;
+  document.getElementById('vfSave').onclick = () => {
+    const title = document.getElementById('vfTitle').value.trim();
+    if (!title || !f.schedule.size || !f.skills.size) { toast('Укажите должность, хотя бы один вариант графика и один навык'); return; }
+    const v = {
+      id: 'c' + (LOG.customVacs.length + 1), custom: true, title,
+      employer: document.getElementById('vfWho').value.trim() || 'Ваша компания',
+      format: f.format, schedule: [...f.schedule], skills: [...f.skills],
+      pay: document.getElementById('vfPay').value.trim() || 'не указана',
+      req: REQ_KEYS.filter(k => f.req[k]).map(k => ({ k, must: f.req[k] === 'must' })),
+    };
+    if (v.format === 'Офлайн') { v.okrug = document.getElementById('vfOkrug').value; v.metro = document.getElementById('vfMetro').value.trim() || '—'; }
+    VACANCIES.push(v); LOG.customVacs.push(v);
+    state.vacId = v.id; buildVacSelect(); closeModal(); renderFeed();
+    logEv('создал свою вакансию: ' + v.title);
+    toast('Лента пересобрана под вашу вакансию');
+  };
+}
+
+// ---------- Вопрос об оплате (проверка Г3; в демо ничего не списывается) ----------
+const PAY_MODELS = ['Подписка в месяц — сколько угодно кандидатов', 'За каждый открытый контакт', 'Только за сотрудника, который вышел на работу', 'Не стал(а) бы платить'];
+function showPaywall(s, next) {
+  let model = null;
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <span class="pill" style="align-self:flex-start">Демо · оплаты нет</span>
+    <h3>🔒 Контакты — платная функция</h3>
+    <p style="margin:0">${s.name} тоже заинтересовался(-ась) вашей вакансией. В рабочей версии контакты будут открываться за плату. Здесь деньги не списываются — нам важно понять, как и сколько вам было бы нормально платить.</p>
+    <div class="fl" style="margin:4px 0 0">Как вам удобнее платить?</div>
+    ${PAY_MODELS.map((m, i) => `<button type="button" class="opt" data-i="${i}">${m}</button>`).join('')}
+    <div id="payAmount"><div class="fl">Сколько было бы нормально, ₽?</div>
+      <input class="inp" id="payInput" type="number" inputmode="numeric" min="0" placeholder="Ваша сумма"></div>
+    <textarea id="payNote" placeholder="Комментарий (необязательно)" style="min-height:60px"></textarea>
+    <button class="btn primary wide" id="paySend">Ответить и открыть контакты</button>
+    <button class="btn wide" id="paySkip">Пропустить вопрос</button></div>`;
+  modal.hidden = false;
+  modal.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    modal.querySelectorAll('.opt').forEach(x => x.classList.toggle('on', x === b));
+    model = PAY_MODELS[+b.dataset.i];
+    document.getElementById('payAmount').style.display = +b.dataset.i === 3 ? 'none' : 'block';
+  });
+  const finish = pay => { LOG.pay = pay; closeModal(); next(); };
+  document.getElementById('paySend').onclick = () => {
+    if (!model) { toast('Выберите вариант — или нажмите «Пропустить вопрос»'); return; }
+    const amount = model === PAY_MODELS[3] ? '' : document.getElementById('payInput').value.trim();
+    const note = document.getElementById('payNote').value.trim();
+    logEv(`оплата: ${model}${amount ? ', ' + amount + ' ₽' : ''}`);
+    finish({ model, amount, note });
+  };
+  document.getElementById('paySkip').onclick = () => { logEv('оплата: пропустил вопрос'); finish({ skipped: true }); };
+}
+
+// ---------- Итог показа (долгое нажатие на логотип или 5 быстрых нажатий) ----------
+function summaryData() {
+  const now = Date.now();
+  const viewMs = { ...LOG.viewMs }; viewMs[state.view] += now - LOG.viewSince;
+  const likes = [], nopes = [];
+  Object.entries(state.decisions).forEach(([k, d]) => {
+    const [vid, sid] = k.split(':'); const v = VACANCIES.find(x => x.id === vid);
+    (d === 'like' ? likes : nopes).push(`${byId(sid).name} (${v.title})`);
+  });
+  let sections = { ...LOG.sections };
+  if (track) Object.entries(track.visible).forEach(([n, t]) => { sections[n] = (sections[n] || 0) + now - t; });
+  // блоки, которые лишь промелькнули при прокрутке (< 1 с), не считаем
+  sections = Object.fromEntries(Object.entries(sections).filter(([, ms]) => ms >= 1000));
+  return { now, viewMs, likes, nopes, sections };
+}
+function summaryText() {
+  const d = summaryData(), L = [];
+  L.push('ИТОГ ПОКАЗА ДЕМО WINDER', 'Длительность: ' + mmss(d.now - LOG.start));
+  L.push(`Режим: свайпы ${mmss(d.viewMs.swipe)}, список ${mmss(d.viewMs.list)}, переключений: ${LOG.viewSwitches}`);
+  L.push(`Фильтры: открывал ${LOG.filterOpens} раз; активные сейчас: ${[...state.filters].map(k => REQS[k].f).join(', ') || 'нет'}`);
+  LOG.customVacs.forEach(v => L.push(`Своя вакансия: ${v.title} (${v.employer}); ${v.format}${v.okrug ? ', ' + v.okrug + ', м. ' + v.metro : ''}; график: ${v.schedule.join(', ')}; навыки: ${v.skills.join(', ')}; требования: ${v.req.map(r => REQS[r.k].n + (r.must ? ' (обяз.)' : '')).join(', ') || 'нет'}; оплата: ${v.pay}`));
+  L.push(`Отметил (${d.likes.length}): ${d.likes.join(', ') || '—'}`);
+  L.push(`Пропустил (${d.nopes.length}): ${d.nopes.join(', ') || '—'}`);
+  L.push(`Мэтчей: ${state.matches.length}`);
+  const pay = LOG.pay;
+  L.push('Оплата: ' + (!pay ? 'до вопроса не дошли' : pay.skipped ? 'пропустил вопрос' : `${pay.model}${pay.amount ? ', ' + pay.amount + ' ₽' : ''}${pay.note ? '; «' + pay.note + '»' : ''}`));
+  const profs = Object.values(LOG.profiles);
+  L.push('Профили: ' + (profs.map(p => `${p.name} — ${p.opens}×, ${secs(p.ms + (track && LOG.profiles[track.sid] === p ? d.now - track.since : 0))}`).join('; ') || 'не открывал'));
+  const secList = Object.entries(d.sections).sort((a, b) => b[1] - a[1]);
+  L.push('Блоки профиля по времени: ' + (secList.map(([n, ms]) => `${n} ${secs(ms)}`).join(', ') || '—'));
+  L.push('', 'Хронология:');
+  LOG.events.forEach(e => L.push(`${mmss(e.at - LOG.start)} ${e.text}`));
+  return L.join('\n');
+}
+function openSummary() {
+  haptic('match');
+  const d = summaryData();
+  const secList = Object.entries(d.sections).sort((a, b) => b[1] - a[1]);
+  const maxMs = secList.length ? secList[0][1] : 1;
+  const pay = LOG.pay;
+  const row = (k, v) => `<div class="sum-row"><span>${k}</span><b>${v}</b></div>`;
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>📋 Итог показа</h3>
+    <p class="small muted" style="margin:0">Для интервьюера. Хранится только на этом устройстве, до закрытия демо.</p>
+    <div class="panel">
+      ${row('Длительность', mmss(d.now - LOG.start))}
+      ${row('Свайпы / список', `${mmss(d.viewMs.swipe)} / ${mmss(d.viewMs.list)}`)}
+      ${row('Переключал режим', LOG.viewSwitches + ' раз')}
+      ${row('Открывал фильтры', LOG.filterOpens + ' раз')}
+      ${row('Отметил / пропустил', `${d.likes.length} / ${d.nopes.length}`)}
+      ${row('Мэтчей', state.matches.length)}
+    </div>
+    <div class="panel"><h3>💰 Оплата</h3><p>${!pay ? 'До вопроса не дошли (нужен первый мэтч)' : pay.skipped ? 'Пропустил вопрос' : `${esc(pay.model)}${pay.amount ? ` — <b>${esc(pay.amount)} ₽</b>` : ''}`}</p>
+      ${pay && pay.note ? `<p class="small muted">«${esc(pay.note)}»</p>` : ''}</div>
+    ${LOG.customVacs.length ? `<div class="panel"><h3>🧾 Своя вакансия</h3>${LOG.customVacs.map(v => `<p class="small"><b>${esc(v.title)}</b> (${esc(v.employer)}) · ${v.format}${v.okrug ? ', ' + v.okrug : ''}<br>График: ${v.schedule.join(', ')}<br>Навыки: ${v.skills.join(', ')}<br>Требования: ${v.req.map(r => REQS[r.k].n + (r.must ? ' (обяз.)' : '')).join(', ') || 'нет'}<br>Оплата: ${esc(v.pay)}</p>`).join('')}</div>` : ''}
+    <div class="panel"><h3>👀 На что смотрел в профилях</h3>
+      ${secList.length ? secList.map(([n, ms]) => `<div class="sec-bar"><span>${n}</span><div class="bar"><i style="width:${Math.round(100 * ms / maxMs)}%"></i></div><span class="small muted">${secs(ms)}</span></div>`).join('') : '<p class="muted">Профили не открывал</p>'}
+    </div>
+    <div class="panel"><details><summary>Хронология (${LOG.events.length})</summary>
+      <div class="tl">${LOG.events.map(e => `<span>${mmss(e.at - LOG.start)} · ${esc(e.text)}</span>`).join('') || '<span>пусто</span>'}</div></details></div>
+    <button class="btn primary wide" id="sumCopy">Скопировать итог</button>
+    <button class="btn ghost wide" id="sumNew">Новый показ (стереть всё)</button>
+    <button class="btn wide" id="sumClose">Закрыть</button></div>`;
+  modal.hidden = false;
+  document.getElementById('sumClose').onclick = closeModal;
+  document.getElementById('sumNew').onclick = () => {
+    const q = 'Стереть итог и начать новый показ?';
+    if (inTelegram && tg.showConfirm) tg.showConfirm(q, ok => { if (ok) location.reload(); });
+    else if (confirm(q)) location.reload();
+  };
+  document.getElementById('sumCopy').onclick = () => {
+    const text = summaryText();
+    const fallback = () => { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} t.remove(); };
+    (navigator.clipboard ? navigator.clipboard.writeText(text).catch(fallback) : Promise.resolve(fallback()))
+      .then(() => toast('Итог скопирован — вставьте в заметки или перешлите Джарвису'));
+  };
+}
+(() => {
+  const logo = document.getElementById('logo');
+  let timer = null, taps = [];
+  logo.addEventListener('pointerdown', () => { timer = setTimeout(openSummary, 1200); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => logo.addEventListener(ev, () => clearTimeout(timer)));
+  logo.addEventListener('click', () => {
+    const now = Date.now(); taps = taps.filter(t => now - t < 1500); taps.push(now);
+    if (taps.length >= 5) { taps = []; openSummary(); }
+  });
+  logo.addEventListener('contextmenu', e => e.preventDefault());
+})();
 document.getElementById('filterBtn').onclick = openFilters;
 
 let toastTimer;
