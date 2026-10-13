@@ -423,6 +423,16 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
 .banner.show { transform: translate(-50%, 0); }
 .banner .ava { width: 38px; height: 38px; font-size: 15px; position: relative; }
 
+/* бот после мэтча */
+.bot { display: flex; gap: 8px; align-items: flex-start; }
+.bot-ava { width: 26px; height: 26px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-weight: 800; font-size: 12px; display: grid; place-items: center; flex: none; }
+.bot-msg { background: var(--surface-2); border-radius: 4px 14px 14px 14px; padding: 8px 11px; font-size: 13.5px; line-height: 1.4; }
+.choices { display: flex; gap: 6px; flex-wrap: wrap; padding-left: 34px; }
+.choices button { padding: 7px 12px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px; transition: transform .12s; }
+.choices button:active { transform: scale(.95); }
+.linkbtn { color: var(--accent); font-size: 12px; font-weight: 600; padding-left: 34px; text-align: left; }
+.ntype.bot { background: var(--accent); }
+
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -632,7 +642,7 @@ const ICON = {"cards": '<svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" w
 const MIN_PUBLIC_TEXTS = 3; // текст отзывов публичен не раньше третьего
 
 // ---------- Состояние ----------
-const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set(), history: [] };
+const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set(), history: [], checkins: {} };
 // ---------- Журнал показа: для заметок интервьюера, только в памяти этого устройства ----------
 const LOG = {
   start: Date.now(), events: [], sections: {}, profiles: {},
@@ -938,7 +948,12 @@ function decide(dir, sid) {
       updateBadge();
       pushNotif({ type: 'match', sid, vacId: v.id, text: `Мэтч с <b>${s.name}</b> — контакты открыты` }, false);
       // Через несколько секунд после мэтча студент «пишет» первым — так ощущается живой сервис
-      const afterMatch = () => { showMatch(s, v); setTimeout(() => pushNotif({ type: 'msg', sid, vacId: v.id, text: `<b>${s.name}:</b> ${firstMessage(v)}` }), 6000); };
+      const afterMatch = () => {
+        showMatch(s, v);
+        setTimeout(() => pushNotif({ type: 'msg', sid, vacId: v.id, text: `<b>${s.name}:</b> ${firstMessage(v)}` }), 6000);
+        // В продукте бот спросит через 3 дня; в демо — через 25 секунд
+        setTimeout(() => pushNotif({ type: 'bot', sid, vacId: v.id, text: `<b>Winder:</b> ${s.name} — удалось договориться? Ответьте одной кнопкой в «Мэтчах»` }), 25000);
+      };
       // При первом мэтче — вопрос об оплате вместо мгновенных контактов
       if (!LOG.pay) showPaywall(s, afterMatch); else afterMatch();
     } else {
@@ -977,6 +992,7 @@ const NTYPE_ICON = {
   like: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   match: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   msg: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3v-3H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>',
+  bot: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.4M12 17h.01"/></svg>',
 };
 const firstMessage = v => v.format === 'Удалённо'
   ? 'Здравствуйте! Увидел(а) вашу вакансию — могу сделать небольшое тестовое задание. Куда прислать?'
@@ -1020,6 +1036,7 @@ function openNotifs() {
     const n = NOTIFS[+r.dataset.i];
     closeModal();
     if (n.vacId !== state.vacId) { state.vacId = n.vacId; sel.value = n.vacId; renderFeed(); }
+    if (n.type === 'bot') { logEv('уведомление бота → мэтчи'); document.querySelector('[data-tab=matches]').click(); return; }
     logEv('уведомление → профиль: ' + byId(n.sid).name);
     openProfile(n.sid);
   });
@@ -1184,17 +1201,46 @@ function renderMatches() {
     page.innerHTML = `<div class="panel"><h3>Пока нет мэтчей</h3><p class="muted">Мэтч — это когда вы отметили студента, а он вашу вакансию. Только после этого открываются контакты и можно оставить отзыв.</p></div>`;
     return;
   }
-  page.innerHTML = state.matches.map(m => {
-    const s = byId(m.sid), v = VACANCIES.find(x => x.id === m.vacId), k = key(m.vacId, m.sid);
-    return `<div class="panel"><div class="mrow">
-        <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
-        <div class="grow"><div class="name">${s.name}, ${s.age}</div><div class="small muted">${v.title} · ${s.handle}</div></div></div>
-      ${state.reviewed[k]
-        ? `<span class="status">✓ Отзыв отправлен на модерацию</span>`
-        : `<button class="btn ghost wide" data-review="${k}">Поработали вместе? Оставить отзыв</button>`}
-    </div>`;
-  }).join('');
+  page.innerHTML = `<p class="small muted" style="margin:0">Переписка — в Telegram. Winder только знакомит и потом уточняет, чем закончилось: так отзыв появляется лишь после реальной совместной работы.</p>`
+    + state.matches.map(m => {
+      const s = byId(m.sid), v = VACANCIES.find(x => x.id === m.vacId), k = key(m.vacId, m.sid);
+      return `<div class="panel"><div class="mrow">
+          <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
+          <div class="grow"><div class="name">${s.name}, ${s.age}</div><div class="small muted">${esc(v.title)} · ${s.handle}</div></div></div>
+        ${checkinHTML(s, k)}
+      </div>`;
+    }).join('');
   page.querySelectorAll('[data-review]').forEach(b => b.onclick = () => openReview(b.dataset.review));
+  page.querySelectorAll('[data-ck]').forEach(b => b.onclick = () => {
+    const [k, field, value] = b.dataset.ck.split('|');
+    state.checkins[k] = { ...(state.checkins[k] || {}), [field]: value };
+    logEv(`бот после мэтча: ${byId(k.split(':')[1]).name} — ${CK_LABEL[field]}: ${b.textContent}`);
+    haptic('tap'); renderMatches();
+  });
+  page.querySelectorAll('[data-ck-reset]').forEach(b => b.onclick = () => { delete state.checkins[b.dataset.ckReset]; renderMatches(); });
+}
+
+const CK_TEXT = { yes: 'да', no: 'нет', talking: 'ещё общаемся', silent: 'не ответил(а)', schedule: 'не подошёл график', pay: 'не сошлись в оплате', other: 'другое' };
+const checkinSummary = () => Object.entries(state.checkins).map(([k, c]) => `${byId(k.split(':')[1]).name}: договорились — ${CK_TEXT[c.deal] || '?'}${c.reason ? ', причина — ' + CK_TEXT[c.reason] : ''}${c.hired ? ', вышел(а) на работу — ' + CK_TEXT[c.hired] : ''}`);
+// ---------- Бот после мэтча: «Договорились?» → «Вышел на работу?» → отзыв ----------
+const CK_LABEL = { deal: 'договорились', reason: 'причина', hired: 'вышел на работу' };
+const botLine = t => `<div class="bot"><span class="bot-ava">W</span><div class="bot-msg">${t}</div></div>`;
+const choices = (k, field, opts) => `<div class="choices">${opts.map(([val, label]) => `<button data-ck="${k}|${field}|${val}">${label}</button>`).join('')}</div>`;
+function checkinHTML(s, k) {
+  const c = state.checkins[k] || {};
+  if (!c.deal) return botLine('Как прошло знакомство? Удалось договориться?')
+    + choices(k, 'deal', [['yes', 'Да'], ['talking', 'Ещё общаемся'], ['no', 'Нет']]);
+  if (c.deal === 'talking') return botLine('Хорошо, спросим ещё раз через 3 дня.')
+    + `<button class="linkbtn" data-ck-reset="${k}">Изменить ответ</button>`;
+  if (c.deal === 'no') return c.reason ? botLine('Спасибо — учтём это при подборе следующих кандидатов.')
+    : botLine('Жаль. Что помешало? Это поможет подбирать точнее.')
+      + choices(k, 'reason', [['silent', 'Не ответил(а)'], ['schedule', 'Не подошёл график'], ['pay', 'Не сошлись в оплате'], ['other', 'Другое']]);
+  if (!c.hired) return botLine(`Отлично! Через 2 недели уточним, вышел(а) ли ${s.name} на работу. <span class="muted">В демо — сразу:</span>`)
+    + botLine(`${s.name} вышел(а) на работу?`) + choices(k, 'hired', [['yes', 'Да'], ['no', 'Нет']]);
+  if (c.hired === 'no') return botLine('Понятно, спасибо. Отзыв можно оставить только после совместной работы.');
+  return botLine('Отлично! Теперь можно оставить отзыв — он поможет студенту на следующем месте работы.')
+    + (state.reviewed[k] ? `<span class="status">✓ Отзыв отправлен на модерацию</span>`
+      : `<button class="btn ghost wide" data-review="${k}">Оставить отзыв</button>`);
 }
 
 const modal = document.getElementById('modal');
@@ -1242,7 +1288,8 @@ function renderAbout() {
       <li>Профиль строится на опыте в проектах и мероприятиях, тесте и отзывах, а не на резюме.</li></ul></div>
     <div class="panel"><h3>Почему профилю можно доверять</h3><ul class="rules">
       <li>Опыт подтверждают другие участники проекта.</li>
-      <li>Отзыв оставляет только работодатель после подтверждённого мэтча.</li>
+      <li>Отзыв оставляет только работодатель после подтверждённого мэтча — и только когда подтвердил, что студент вышел на работу.</li>
+      <li>Переписка — в привычном Telegram. Winder знакомит и потом уточняет одной кнопкой, чем закончилось.</li>
       <li>Текст отзывов публичен не раньше третьего отзыва; доля «наняли бы снова» видна сразу.</li>
       <li>Тест на сильные стороны — самооценка, а не психодиагностика. Рядом всегда оценки из отзывов.</li>
       <li>Порядок в ленте — по понятным правилам (график, навыки, требования вакансии, заполненность), не ИИ.</li>
@@ -1251,7 +1298,7 @@ function renderAbout() {
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
   document.getElementById('resetDemo').onclick = () => {
     state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
-    state.filters = new Set(); state.history = []; updateBadge(); renderFeed(); toast('Демо сброшено');
+    state.filters = new Set(); state.history = []; state.checkins = {}; updateBadge(); renderFeed(); toast('Демо сброшено');
   };
 }
 
@@ -1262,7 +1309,9 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
   ['feed', 'matches', 'about'].forEach(t => document.getElementById('screen-' + t).hidden = t !== state.tab);
   if (state.tab === 'matches') { state.seenMatches = state.matches.length; updateBadge(); renderMatches(); }
   if (state.tab === 'about') renderAbout();
-  logEv('вкладка: ' + b.textContent.trim());
+  logEv('вкладка: ' + { feed: 'Кандидаты', matches: 'Мэтчи', about: 'О сервисе' }[state.tab]);
+  // панель вакансии нужна только в ленте — на остальных вкладках это шум
+  document.querySelector('.vacbar').hidden = state.tab !== 'feed';
   haptic('tap');
 });
 
@@ -1404,6 +1453,7 @@ function summaryText() {
   L.push(`Отметил (${d.likes.length}): ${d.likes.join(', ') || '—'}`);
   L.push(`Пропустил (${d.nopes.length}): ${d.nopes.join(', ') || '—'}`);
   L.push(`Мэтчей: ${state.matches.length}`);
+  L.push('После мэтча (бот): ' + (checkinSummary().join('; ') || 'не отвечал'));
   const pay = LOG.pay;
   L.push('Оплата: ' + (!pay ? 'до вопроса не дошли' : pay.skipped ? 'пропустил вопрос' : `${pay.model}${pay.amount ? ', ' + pay.amount + ' ₽' : ''}${pay.note ? '; «' + pay.note + '»' : ''}`));
   const profs = Object.values(LOG.profiles);
@@ -1433,6 +1483,7 @@ function openSummary() {
       ${row('Открывал уведомления', LOG.notifOpens + ' раз')}
       ${row('Отметил / пропустил', `${d.likes.length} / ${d.nopes.length}`)}
       ${row('Мэтчей', state.matches.length)}
+      ${row('Ответы боту после мэтча', checkinSummary().length)}
     </div>
     <div class="panel"><h3>💰 Оплата</h3><p>${!pay ? 'До вопроса не дошли (нужен первый мэтч)' : pay.skipped ? 'Пропустил вопрос' : `${esc(pay.model)}${pay.amount ? ` — <b>${esc(pay.amount)} ₽</b>` : ''}`}</p>
       ${pay && pay.note ? `<p class="small muted">«${esc(pay.note)}»</p>` : ''}</div>
