@@ -12,7 +12,7 @@
 :root {
   /* Сдержанный премиум: тёплый нейтральный фон, один акцент, мягкие многослойные тени */
   --bg: #f5f4f1; --surface: #ffffff; --surface-2: #f3f2ee; --text: #111114; --muted: #6e6d75;
-  --line: #e8e6e1; --accent: #5b4cff; --accent-2: #8a5cff; --accent-soft: #eeecff; --on-accent: #ffffff;
+  --line: #e8e6e1; --accent: #5b4cff; --accent-2: #b04bff; --accent-soft: #eeecff; --on-accent: #ffffff;
   --like: #14a05a; --like-soft: #e4f5eb; --nope: #e5484d; --nope-soft: #fdeaea;
   --star: #f5a524; --self: #c4bcff; --peer: #5b4cff;
   --shadow: 0 1px 2px rgba(17, 17, 20, .04), 0 8px 24px rgba(17, 17, 20, .08);
@@ -23,7 +23,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0b0b0f; --surface: #15151b; --surface-2: #1c1c24; --text: #f4f4f6; --muted: #8e8e9a;
-    --line: #26262f; --accent: #8b80ff; --accent-2: #b08bff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
+    --line: #26262f; --accent: #8b80ff; --accent-2: #d08cff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
     --like: #3fd08a; --like-soft: #11291d; --nope: #ff6b6f; --nope-soft: #331617;
     --self: #3f3a73; --peer: #8b80ff;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
@@ -33,7 +33,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #0b0b0f; --surface: #15151b; --surface-2: #1c1c24; --text: #f4f4f6; --muted: #8e8e9a;
-  --line: #26262f; --accent: #8b80ff; --accent-2: #b08bff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
+  --line: #26262f; --accent: #8b80ff; --accent-2: #d08cff; --accent-soft: #221f3d; --on-accent: #0d0b1f;
   --like: #3fd08a; --like-soft: #11291d; --nope: #ff6b6f; --nope-soft: #331617;
   --self: #3f3a73; --peer: #8b80ff;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
@@ -360,6 +360,69 @@ details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
 .card .body { gap: 7px; padding: 12px 14px 12px; }
 .top { padding-bottom: 8px; gap: 8px; }
 
+/* ===================== v5: меньше шума, ярче градиент, уведомления ===================== */
+body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 62%), var(--bg); background-attachment: fixed; }
+.top { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 12px 16px 8px; gap: 10px; }
+.brand { gap: 8px; }
+.bell { margin-left: auto; position: relative; width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: var(--surface); box-shadow: var(--shadow); color: var(--text); }
+.bell .ico { width: 20px; height: 20px; transform-origin: 50% 15%; }
+.bell.ring .ico { animation: ring .9s ease; }
+@keyframes ring { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 35% { transform: rotate(-13deg); } 55% { transform: rotate(9deg); } 75% { transform: rotate(-5deg); } }
+.dot-count { position: absolute; top: 4px; right: 4px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: var(--nope); color: #fff; font-size: 10px; font-weight: 800; display: grid; place-items: center; box-shadow: 0 0 0 2px var(--bg); }
+.dot-count.accent { background: var(--accent); }
+.vacbar { display: flex; gap: 8px; align-items: stretch; }
+.vac { flex: 1; min-width: 0; padding: 7px 12px; border-radius: 14px; gap: 6px; }
+.vac select { font-size: 15px; }
+.vac-meta { font-size: 11.5px; margin-top: 0; }
+.vac .chev .ico { width: 16px; height: 16px; }
+.icon-seg { flex: none; padding: 3px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); }
+.icon-seg button { width: 38px; padding: 0; }
+.icon-seg button.on { background: var(--accent-soft); color: var(--accent); box-shadow: none; }
+.icon-seg .ico, .fbtn .ico { width: 18px; height: 18px; }
+.fbtn { width: 46px; padding: 0; justify-content: center; position: relative; background: var(--surface); box-shadow: var(--shadow); }
+.fbtn .dot-count { top: 3px; right: 3px; }
+
+/* карточка: крупный яркий верх, спокойный низ */
+.card .hero { flex: 0 0 40%; min-height: 150px; padding: 16px 18px; }
+.card .hero .initials { font-size: 120px; opacity: .22; right: 10px; top: 46%; }
+.hero::after { background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, .22)); }
+.card .body { gap: 12px; padding: 14px 16px 16px; }
+.rating { gap: 6px; font-size: 13px; }
+.meters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.meter { background: var(--surface-2); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
+.meter span { font-size: 10.5px; color: var(--muted); font-weight: 600; letter-spacing: .02em; }
+.meter .segs { display: flex; gap: 3px; }
+.meter .segs i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.meter .segs i.on { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.meter b { font-size: 13px; font-weight: 800; letter-spacing: -.01em; }
+.facts-line { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.facts-line .y, .facts-line .n { white-space: nowrap; }
+.facts-line .y { color: var(--text); font-weight: 600; }
+.facts-line .y::before { content: "✓ "; color: var(--like); }
+.facts-line .n { text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent); }
+.kv .lbl { display: block; margin-bottom: 2px; }
+
+/* кнопки: Tinder-раскладка — две маленькие по краям */
+.btn-round.small { width: 46px; height: 46px; color: var(--muted); }
+.btn-round.small .ico { width: 20px; height: 20px; stroke-width: 2; }
+.actions { gap: 16px; padding: 12px 16px 10px; }
+
+/* уведомления */
+.nrow { display: flex; gap: 12px; align-items: center; text-align: left; padding: 10px; border-radius: 16px; width: 100%; }
+.nrow.unread { background: var(--accent-soft); }
+.nrow .ava { position: relative; }
+.ntype { position: absolute; right: -3px; bottom: -3px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; color: #fff; box-shadow: 0 0 0 2px var(--bg); }
+.ntype .ico { width: 11px; height: 11px; stroke-width: 2.6; }
+.ntype.like { background: #ff4d79; }
+.ntype.match { background: var(--accent); }
+.ntype.msg { background: #17a06a; }
+.ntext { font-size: 14px; line-height: 1.35; }
+.banner { position: fixed; top: 10px; left: 50%; width: calc(100% - 24px); max-width: 456px; z-index: 45; display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 18px;
+  background: var(--glass); -webkit-backdrop-filter: saturate(1.5) blur(20px); backdrop-filter: saturate(1.5) blur(20px); box-shadow: var(--shadow-lg);
+  transform: translate(-50%, -150%); transition: transform .45s cubic-bezier(.2, .9, .25, 1.15); cursor: pointer; }
+.banner.show { transform: translate(-50%, 0); }
+.banner .ava { width: 38px; height: 38px; font-size: 15px; position: relative; }
+
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -369,23 +432,21 @@ details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
     <div class="brand">
       <span class="logo" id="logo">Winder</span>
       <span class="pill">ДЕМО</span>
-      <span class="who">вы — работодатель</span>
+      <button class="bell" id="bellBtn" aria-label="Уведомления"><svg class="ico" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 6 2 7H4c.5-1 2-3 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot-count" id="bellBadge" hidden></span></button>
     </div>
-    <label class="vac">
-      <div style="flex:1;min-width:0">
-        <div class="vac-label">Вакансия</div>
-        <select id="vacSelect"></select>
-        <div class="vac-meta" id="vacMeta"></div>
-        <div class="vac-req" id="vacReq"></div>
+    <div class="vacbar">
+      <label class="vac">
+        <div style="flex:1;min-width:0">
+          <select id="vacSelect" aria-label="Вакансия"></select>
+          <div class="vac-meta" id="vacMeta"></div>
+        </div>
+        <span class="chev"><svg class="ico" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg></span>
+      </label>
+      <div class="seg icon-seg" role="tablist">
+        <button data-view="swipe" class="on" aria-label="Свайпы"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg></button>
+        <button data-view="list" aria-label="Список"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button>
       </div>
-      <span class="chev">▾</span>
-    </label>
-    <div class="toolbar">
-      <div class="seg" role="tablist">
-        <button data-view="swipe" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Свайпы</button>
-        <button data-view="list"><svg class="ico" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>Список</button>
-      </div>
-      <button class="fbtn" id="filterBtn"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Фильтры</span></button>
+      <button class="fbtn" id="filterBtn" aria-label="Фильтры"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span class="dot-count accent" id="filterCount" hidden></span></button>
     </div>
   </header>
 
@@ -393,12 +454,12 @@ details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
     <section class="screen" id="screen-feed">
       <div class="deck" id="deck"></div>
       <div class="actions" id="feedActions">
+        <button class="btn-round small" id="btnUndo" aria-label="Вернуть последнего"><svg class="ico" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
         <button class="btn-round nope" id="btnNope" aria-label="Пропустить"><svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
-        <button class="btn-round info" id="btnInfo" aria-label="Открыть профиль"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
         <button class="btn-round like" id="btnLike" aria-label="Интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
+        <button class="btn-round small" id="btnInfo" aria-label="Открыть профиль"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
       </div>
       <div class="list" id="list" hidden></div>
-      <p class="rule-note">Порядок — по правилам: график → навыки → требования → заполненность профиля. Это не ИИ.</p>
     </section>
 
     <section class="screen" id="screen-matches" hidden>
@@ -413,13 +474,14 @@ details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
   <nav class="tabs">
     <button data-tab="feed" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Кандидаты</button>
     <button data-tab="matches"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>Мэтчи<span class="badge" id="matchBadge" hidden></span></button>
-    <button data-tab="about"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Как это работает</button>
+    <button data-tab="about"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>О сервисе</button>
   </nav>
 </div>
 
 <div id="sheet" class="sheet" hidden></div>
 <div id="overlay" hidden></div>
 <div id="modal" hidden></div>
+<div id="banner" class="banner" role="status"></div>
 
 <script>
 // ---------- Данные демо (все люди вымышленные) ----------
@@ -570,11 +632,11 @@ const ICON = {"cards": '<svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" w
 const MIN_PUBLIC_TEXTS = 3; // текст отзывов публичен не раньше третьего
 
 // ---------- Состояние ----------
-const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set() };
+const state = { vacId: 'v1', decisions: {}, matches: [], reviewed: {}, tab: 'feed', seenMatches: 0, view: 'swipe', filters: new Set(), history: [] };
 // ---------- Журнал показа: для заметок интервьюера, только в памяти этого устройства ----------
 const LOG = {
   start: Date.now(), events: [], sections: {}, profiles: {},
-  viewMs: { swipe: 0, list: 0 }, viewSince: Date.now(), viewSwitches: 0, filterOpens: 0, pay: null, customVacs: [],
+  viewMs: { swipe: 0, list: 0 }, viewSince: Date.now(), viewSwitches: 0, filterOpens: 0, notifOpens: 0, pay: null, customVacs: [],
 };
 const logEv = text => LOG.events.push({ at: Date.now(), text });
 const secs = ms => Math.round(ms / 1000) + ' с';
@@ -673,36 +735,41 @@ const reqChip = (s, v, r) => {
   const R = REQS[r.k];
   return `<span class="chip c ${r.has ? 'hit' : 'miss'}" style="--h:${R.h}"><span class="ci">${R.i}</span>${r.has ? R.yes(s, v) : R.no(s, v)}</span>`;
 };
-const grad = h => `radial-gradient(120% 90% at 0% 0%, hsl(${h} 85% 70%) 0%, transparent 60%), radial-gradient(100% 100% at 100% 100%, hsl(${(h + 55) % 360} 75% 42%) 0%, transparent 65%), linear-gradient(135deg, hsl(${(h + 20) % 360} 68% 56%), hsl(${(h + 40) % 360} 72% 40%))`;
+const grad = h => `radial-gradient(130% 100% at 0% 0%, hsl(${h} 95% 70%) 0%, transparent 55%), radial-gradient(110% 110% at 100% 100%, hsl(${(h + 60) % 360} 92% 50%) 0%, transparent 60%), linear-gradient(135deg, hsl(${(h + 15) % 360} 88% 60%), hsl(${(h + 45) % 360} 88% 46%))`;
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function ratingHTML(s) {
   const st = stats(s);
   if (!st.n) return `<div class="rating muted small">Отзывов пока нет — новичок на платформе</div>`;
   // Главная цифра — «наняли бы снова». Среднее по категориям не показываем: это профиль сильных сторон, а не оценка качества
-  return `<div class="rating"><span>👍</span><b>${st.rec}%</b>
-    <span class="muted small">наняли бы снова · ${reviewsWord(st.n)}</span></div>`;
+  return `<div class="rating"><b>${st.rec}%</b>
+    <span class="muted">наняли бы снова · ${reviewsWord(st.n)}</span></div>`;
 }
 
 // ---------- Карточка ----------
+// Индикатор совпадения: сколько из требований вакансии закрыто
+const meter = (label, hit, total) => `<div class="meter"><span>${label}</span>
+  <div class="segs">${total ? Array.from({ length: total }, (_, i) => `<i class="${i < hit ? 'on' : ''}"></i>`).join('') : '<i class="on"></i>'}</div>
+  <b>${total ? hit + ' из ' + total : '—'}</b></div>`;
+
 function cardHTML(s, f, v) {
-  const sched = s.schedule.map(x => chip(x, x === 'Гибкий' || v.schedule.includes(x) || v.schedule.includes('Гибкий'))).join('');
-  const skills = s.skills.map(x => chip(x, v.skills.includes(x))).join('');
   const e = s.exp[0];
+  // Одна строка фактов вместо россыпи чипов: метро + требования вакансии (есть — ✓, нет — зачёркнуто)
+  const facts = ['м. ' + s.metro].concat(f.reqs.map(r => r.has
+    ? `<span class="y">${REQS[r.k].yes(s, v)}</span>` : `<span class="n">${REQS[r.k].n}</span>`)).join(' · ');
   return `
     <div class="hero" style="background:${grad(s.hue)}">
-      <span class="fitbadge">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal} · требования ${f.reqHit}/${f.reqTotal}</span>
       <span class="initials">${s.name[0]}</span>
       <div><h2>${s.name}, ${s.age}</h2><div class="sub">${s.uni}</div></div>
       <span class="stamp like">ИНТЕРЕСНО</span><span class="stamp nope">НЕТ</span>
     </div>
     <div class="body">
       ${ratingHTML(s)}
-      <div class="row">${sched}${skills}</div>
-      <div class="row">${metroChip(s)}${f.reqs.map(r => reqChip(s, v, r)).join('')}</div>
-      <div><div class="lbl">Опыт</div>
+      <div class="meters">${meter('График', f.schedHit, f.schedTotal)}${meter('Навыки', f.skillHit, f.skillTotal)}${meter('Требования', f.reqHit, f.reqTotal)}</div>
+      <div class="facts-line">${facts}</div>
+      <div class="kv"><span class="lbl">Опыт</span>
         <div class="exp-line"><b>${e.r}</b> — ${e.t} ${e.c ? `<span class="ok">✓ ${e.c}</span>` : ''}</div></div>
-      <div><div class="lbl">Сильные стороны <span class="tag-self">самооценка</span></div>
+      <div class="kv"><span class="lbl">Сильные стороны · самооценка</span>
         <div class="exp-line">${topSelf(s).join(' · ')}</div></div>
     </div>`;
 }
@@ -714,19 +781,16 @@ const deckEl = document.getElementById('deck');
 function renderFeed() {
   const v = vac();
   const where = v.format !== 'Офлайн' ? 'удалённо' : v.metro && v.metro !== '—' ? `м. ${v.metro} (${v.okrug})` : v.okrug;
-  document.getElementById('vacMeta').textContent = `${where} · ${v.schedule.join(', ')} · ${v.pay}`;
-  document.getElementById('vacReq').textContent = v.req.length
-    ? 'Нужно: ' + v.req.map(r => `${REQS[r.k].i} ${REQS[r.k].n}${r.must ? ' (обязательно)' : ''}`).join(', ')
-    : 'Особых требований нет';
+  document.getElementById('vacMeta').textContent = `${v.employer} · ${where} · ${v.pay}`;
   const swipe = state.view === 'swipe';
   deckEl.hidden = !swipe;
   document.getElementById('feedActions').hidden = !swipe;
   document.getElementById('list').hidden = swipe;
   document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.view === state.view));
   const n = [...state.filters].filter(k => filterKeys(v).includes(k)).length;
-  const fb = document.getElementById('filterBtn');
-  fb.querySelector('span').textContent = n ? `Фильтры · ${n}` : 'Фильтры';
-  fb.classList.toggle('active', n > 0);
+  const fc = document.getElementById('filterCount');
+  fc.hidden = !n; fc.textContent = n;
+  document.getElementById('filterBtn').classList.toggle('active', n > 0);
   if (swipe) renderDeck(); else renderList();
 }
 
@@ -808,15 +872,14 @@ function renderList() {
       const status = matched ? '<span><span class="status ok-s">🤝 мэтч</span></span>'
         : d === 'like' ? '<span><span class="status">✓ отклик отправлен</span></span>'
         : d === 'nope' ? '<span><span class="status">пропущен</span></span>' : '';
-      const icons = f.reqs.map(r => `<span class="${r.has ? '' : 'miss-i'}" title="${r.has ? REQS[r.k].yes(s, v) : REQS[r.k].no(s, v)}">${REQS[r.k].i}</span>`).join(' ');
       const btns = d === 'nope' ? `<button class="mini" data-undo="${s.id}" aria-label="Вернуть">${ICON.undo}</button>`
         : d ? '' : `<div class="lbtns"><button class="mini nope" data-nope="${s.id}" aria-label="Пропустить">${ICON.x}</button><button class="mini like" data-like="${s.id}" aria-label="Интересно">${ICON.check}</button></div>`;
       return `<div class="lrow ${d === 'nope' ? 'skipped' : ''}" data-sid="${s.id}">
         <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
         <div class="grow">
-          <div class="name">${s.name}, ${s.age} <span class="small muted">· ${st.n ? `👍 ${st.rec}%` : 'новичок'}</span></div>
-          <div class="small muted">график ${f.schedHit}/${f.schedTotal} · навыки ${f.skillHit}/${f.skillTotal} · треб. ${f.reqHit}/${f.reqTotal}</div>
-          <div class="icons">🚇 ${s.metro} · ${icons}</div>
+          <div class="name">${s.name}, ${s.age}</div>
+          <div class="small muted">${st.n ? `${st.rec}% наняли бы снова` : 'новичок, отзывов нет'}</div>
+          <div class="small muted">м. ${s.metro} · совпадение <b style="color:var(--text);white-space:nowrap">${f.schedHit + f.skillHit + f.reqHit} из ${f.schedTotal + f.skillTotal + f.reqTotal}</b></div>
           ${status}
         </div>${btns}</div>`;
     }).join('');
@@ -863,6 +926,7 @@ function decide(dir, sid) {
   if (!sid) return;
   haptic('tap');
   state.decisions[key(v.id, sid)] = dir;
+  state.history.push({ vacId: v.id, sid });
   const s = byId(sid);
   logEv(`${dir === 'like' ? '✓ интересно' : '✕ пропустил'}: ${s.name} (${v.title}, ${state.view === 'swipe' ? 'свайпы' : 'список'})`);
   const done = () => {
@@ -872,8 +936,11 @@ function decide(dir, sid) {
       state.matches.unshift({ vacId: v.id, sid });
       logEv(`🤝 мэтч: ${s.name}`);
       updateBadge();
+      pushNotif({ type: 'match', sid, vacId: v.id, text: `Мэтч с <b>${s.name}</b> — контакты открыты` }, false);
+      // Через несколько секунд после мэтча студент «пишет» первым — так ощущается живой сервис
+      const afterMatch = () => { showMatch(s, v); setTimeout(() => pushNotif({ type: 'msg', sid, vacId: v.id, text: `<b>${s.name}:</b> ${firstMessage(v)}` }), 6000); };
       // При первом мэтче — вопрос об оплате вместо мгновенных контактов
-      if (!LOG.pay) showPaywall(s, () => showMatch(s, v)); else showMatch(s, v);
+      if (!LOG.pay) showPaywall(s, afterMatch); else afterMatch();
     } else {
       toast(`${s.name} увидит вашу вакансию в своей ленте. Если ответит взаимностью — будет мэтч.`);
     }
@@ -890,6 +957,74 @@ function decide(dir, sid) {
 document.getElementById('btnLike').onclick = () => decide('like');
 document.getElementById('btnNope').onclick = () => decide('nope');
 document.getElementById('btnInfo').onclick = () => { const el = topCard(); if (el) openProfile(el.dataset.sid); };
+// «Вернуть»: отменить последнее решение — на показах по карточкам часто промахиваются
+document.getElementById('btnUndo').onclick = () => {
+  const last = state.history[state.history.length - 1];
+  if (!last) { toast('Пока нечего возвращать'); return; }
+  const s = byId(last.sid);
+  if (state.matches.some(m => m.vacId === last.vacId && m.sid === last.sid)) { toast(`С ${s.name} уже мэтч — контакты открыты, отменить нельзя`); return; }
+  state.history.pop();
+  delete state.decisions[key(last.vacId, last.sid)];
+  if (last.vacId !== state.vacId) { state.vacId = last.vacId; sel.value = last.vacId; }
+  haptic('tap'); renderFeed();
+  logEv(`↺ вернул: ${s.name}`);
+};
+
+// ---------- Уведомления: лайки студентов, мэтчи, сообщения ----------
+const NOTIFS = [];
+const banner = document.getElementById('banner');
+const NTYPE_ICON = {
+  like: '<svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  match: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  msg: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3v-3H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>',
+};
+const firstMessage = v => v.format === 'Удалённо'
+  ? 'Здравствуйте! Увидел(а) вашу вакансию — могу сделать небольшое тестовое задание. Куда прислать?'
+  : 'Здравствуйте! Увидел(а) вашу вакансию. Когда можно подойти познакомиться?';
+const ago = t => { const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? 'только что' : m < 60 ? m + ' мин назад' : Math.floor(m / 60) + ' ч назад'; };
+const notifAva = n => { const s = byId(n.sid); return `<div class="ava" style="background:${grad(s.hue)}">${s.name[0]}<span class="ntype ${n.type}">${NTYPE_ICON[n.type]}</span></div>`; };
+
+function updateBell(ring) {
+  const unread = NOTIFS.filter(n => !n.read).length;
+  const b = document.getElementById('bellBadge');
+  b.hidden = !unread; b.textContent = unread;
+  if (ring) { const bell = document.getElementById('bellBtn'); bell.classList.remove('ring'); void bell.offsetWidth; bell.classList.add('ring'); }
+}
+let bannerTimer;
+function pushNotif(n, showBanner = true) {
+  NOTIFS.unshift({ ...n, at: n.at || Date.now(), read: false });
+  updateBell(true);
+  if (!showBanner) return;
+  haptic('tap');
+  banner.innerHTML = `${notifAva(n)}<div class="grow ntext">${n.text}</div>`;
+  banner.classList.add('show');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => banner.classList.remove('show'), 4000);
+}
+banner.onclick = () => { banner.classList.remove('show'); openNotifs(); };
+
+function openNotifs() {
+  LOG.notifOpens++; logEv('открыл уведомления');
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>Уведомления</h3>
+    ${NOTIFS.length ? NOTIFS.map((n, i) => `<button class="nrow ${n.read ? '' : 'unread'}" data-i="${i}">
+      ${notifAva(n)}<div class="grow"><div class="ntext">${n.text}</div><div class="small muted">${ago(n.at)}${n.type === 'like' ? '' : ' · ' + esc(VACANCIES.find(v => v.id === n.vacId).title)}</div></div></button>`).join('')
+      : '<p class="muted" style="margin:0">Пока тихо. Здесь появятся отклики студентов, мэтчи и сообщения.</p>'}
+    <button class="btn wide" id="nClose">Закрыть</button></div>`;
+  modal.hidden = false;
+  NOTIFS.forEach(n => { n.read = true; }); updateBell();
+  document.getElementById('nClose').onclick = closeModal;
+  modal.onclick = e => { if (e.target === modal) closeModal(); };
+  modal.querySelectorAll('.nrow').forEach(r => r.onclick = () => {
+    const n = NOTIFS[+r.dataset.i];
+    closeModal();
+    if (n.vacId !== state.vacId) { state.vacId = n.vacId; sel.value = n.vacId; renderFeed(); }
+    logEv('уведомление → профиль: ' + byId(n.sid).name);
+    openProfile(n.sid);
+  });
+}
+document.getElementById('bellBtn').onclick = openNotifs;
 
 // ---------- Профиль ----------
 const sheet = document.getElementById('sheet');
@@ -1116,7 +1251,7 @@ function renderAbout() {
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
   document.getElementById('resetDemo').onclick = () => {
     state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
-    state.filters = new Set(); updateBadge(); renderFeed(); toast('Демо сброшено');
+    state.filters = new Set(); state.history = []; updateBadge(); renderFeed(); toast('Демо сброшено');
   };
 }
 
@@ -1133,7 +1268,7 @@ document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
 
 const sel = document.getElementById('vacSelect');
 function buildVacSelect() {
-  sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${esc(v.employer)}: ${esc(v.title)}</option>`).join('')
+  sel.innerHTML = VACANCIES.map(v => `<option value="${v.id}">${esc(v.title)}</option>`).join('')
     + '<option value="__new">＋ Своя вакансия…</option>';
   sel.value = state.vacId;
 }
@@ -1264,6 +1399,7 @@ function summaryText() {
   L.push('ИТОГ ПОКАЗА ДЕМО WINDER', 'Длительность: ' + mmss(d.now - LOG.start));
   L.push(`Режим: свайпы ${mmss(d.viewMs.swipe)}, список ${mmss(d.viewMs.list)}, переключений: ${LOG.viewSwitches}`);
   L.push(`Фильтры: открывал ${LOG.filterOpens} раз; активные сейчас: ${[...state.filters].map(k => REQS[k].f).join(', ') || 'нет'}`);
+  L.push(`Уведомления: открывал ${LOG.notifOpens} раз`);
   LOG.customVacs.forEach(v => L.push(`Своя вакансия: ${v.title} (${v.employer}); ${v.format}${v.okrug ? ', ' + v.okrug + ', м. ' + v.metro : ''}; график: ${v.schedule.join(', ')}; навыки: ${v.skills.join(', ')}; требования: ${v.req.map(r => REQS[r.k].n + (r.must ? ' (обяз.)' : '')).join(', ') || 'нет'}; оплата: ${v.pay}`));
   L.push(`Отметил (${d.likes.length}): ${d.likes.join(', ') || '—'}`);
   L.push(`Пропустил (${d.nopes.length}): ${d.nopes.join(', ') || '—'}`);
@@ -1294,6 +1430,7 @@ function openSummary() {
       ${row('Свайпы / список', `${mmss(d.viewMs.swipe)} / ${mmss(d.viewMs.list)}`)}
       ${row('Переключал режим', LOG.viewSwitches + ' раз')}
       ${row('Открывал фильтры', LOG.filterOpens + ' раз')}
+      ${row('Открывал уведомления', LOG.notifOpens + ' раз')}
       ${row('Отметил / пропустил', `${d.likes.length} / ${d.nopes.length}`)}
       ${row('Мэтчей', state.matches.length)}
     </div>
@@ -1344,6 +1481,19 @@ function toast(msg) {
 }
 
 renderFeed();
+
+// Стартовые уведомления: двое студентов уже отметили первую вакансию
+[['a1', 5], ['p7', 12]].forEach(([sid, min]) => NOTIFS.push({
+  type: 'like', sid, vacId: 'v1', read: false, at: Date.now() - min * 60000,
+  text: `<b>${byId(sid).name}</b> отметил(а) вашу вакансию «${VACANCIES[0].title}»`,
+}));
+updateBell();
+// Через 45 секунд — «живой» отклик от студента, который подходит под текущую вакансию
+setTimeout(() => {
+  const v = vac();
+  const c = STUDENTS.find(s => fit(s, v) && studentLikes(s, v) && !state.decisions[key(v.id, s.id)] && !NOTIFS.some(n => n.sid === s.id && n.vacId === v.id));
+  if (c) pushNotif({ type: 'like', sid: c.id, vacId: v.id, text: `<b>${c.name}</b> отметил(а) вашу вакансию «${esc(v.title)}»` });
+}, 45000);
 </script>
 </body>
 </html>
