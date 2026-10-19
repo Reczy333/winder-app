@@ -433,6 +433,16 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
 .linkbtn { color: var(--accent); font-size: 12px; font-weight: 600; padding-left: 34px; text-align: left; }
 .ntype.bot { background: var(--accent); }
 
+/* демо по ссылке: приветствие и 3 вопроса */
+.fb-pill { margin-left: auto; padding: 8px 12px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 12.5px; font-weight: 700; box-shadow: var(--shadow); animation: pop .5s cubic-bezier(.2, .9, .25, 1.3); }
+.fb-pill:not([hidden]) + .bell { margin-left: 8px; }
+.opts-col { display: flex; flex-direction: column; gap: 6px; }
+.chk { display: flex; gap: 8px; align-items: center; font-size: 13px; margin-top: 8px; cursor: pointer; }
+.chk input { width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.fb-text { min-height: 150px; font-size: 12px; margin-top: 8px; }
+.intro .brand { margin-bottom: 2px; }
+.kbd { display: inline-block; padding: 0 5px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; }
+
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -442,6 +452,7 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
     <div class="brand">
       <span class="logo" id="logo">Winder</span>
       <span class="pill">ДЕМО</span>
+      <button class="fb-pill" id="fbPill" hidden>3 вопроса · 1 мин</button>
       <button class="bell" id="bellBtn" aria-label="Уведомления"><svg class="ico" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 6 2 7H4c.5-1 2-3 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot-count" id="bellBadge" hidden></span></button>
     </div>
     <div class="vacbar">
@@ -937,6 +948,7 @@ function decide(dir, sid) {
   haptic('tap');
   state.decisions[key(v.id, sid)] = dir;
   state.history.push({ vacId: v.id, sid });
+  if (state.history.length >= 3) maybeOfferFeedback();
   const s = byId(sid);
   logEv(`${dir === 'like' ? '✓ интересно' : '✕ пропустил'}: ${s.name} (${v.title}, ${state.view === 'swipe' ? 'свайпы' : 'список'})`);
   const done = () => {
@@ -1295,7 +1307,9 @@ function renderAbout() {
       <li>Порядок в ленте — по понятным правилам (график, навыки, требования вакансии, заполненность), не ИИ.</li>
       <li>Практичное (метро, права, медкнижка, самозанятость) указывает студент; документы проверяются при выходе на работу.</li>
       <li>Профили и отзывы проходят ручную модерацию.</li></ul></div>
+    <button class="btn primary wide" id="aboutFb">Ответить на 3 вопроса о демо</button>
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
+  document.getElementById('aboutFb').onclick = openFeedback;
   document.getElementById('resetDemo').onclick = () => {
     state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
     state.filters = new Set(); state.history = []; state.checkins = {}; updateBadge(); renderFeed(); toast('Демо сброшено');
@@ -1323,6 +1337,7 @@ function buildVacSelect() {
 }
 buildVacSelect();
 sel.onchange = () => {
+  sel.blur(); // иначе стрелки на клавиатуре продолжают переключать вакансии вместо свайпа
   if (sel.value === '__new') { sel.value = state.vacId; openVacancyForm(); return; }
   state.vacId = sel.value; renderFeed();
   logEv('вакансия: ' + vac().title);
@@ -1503,12 +1518,7 @@ function openSummary() {
     if (inTelegram && tg.showConfirm) tg.showConfirm(q, ok => { if (ok) location.reload(); });
     else if (confirm(q)) location.reload();
   };
-  document.getElementById('sumCopy').onclick = () => {
-    const text = summaryText();
-    const fallback = () => { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} t.remove(); };
-    (navigator.clipboard ? navigator.clipboard.writeText(text).catch(fallback) : Promise.resolve(fallback()))
-      .then(() => toast('Итог скопирован — вставьте в заметки или перешлите Джарвису'));
-  };
+  document.getElementById('sumCopy').onclick = () => copyText(summaryText()).then(() => toast('Итог скопирован — вставьте в заметки или перешлите Джарвису'));
 }
 (() => {
   const logo = document.getElementById('logo');
@@ -1522,6 +1532,120 @@ function openSummary() {
   logo.addEventListener('contextmenu', e => e.preventDefault());
 })();
 document.getElementById('filterBtn').onclick = openFilters;
+
+// Копирование в буфер с запасным путём (в Telegram и старых браузерах clipboard API бывает недоступен)
+const copyText = text => {
+  const fallback = () => { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} t.remove(); };
+  return navigator.clipboard ? navigator.clipboard.writeText(text).catch(fallback) : Promise.resolve(fallback());
+};
+
+// ---------- Демо по ссылке: приветствие и 3 вопроса в конце (ответ уходит Ивану без сервера) ----------
+const FOUNDER_TG = 'https://t.me/recz_YYx';
+const FB = { offered: false, sent: false };
+const Q1 = ['Да, точно', 'Скорее да', 'Скорее нет', 'Нет'];
+
+function showIntro() {
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box intro">
+    <div class="brand"><span class="logo">Winder</span><span class="pill">ДЕМО</span></div>
+    <h3 style="font-size:20px;letter-spacing:-.02em">Студенты на подработку — по опыту и отзывам, а не по резюме</h3>
+    <ul class="rules">
+      <li>Перед вами студенты под вакансию. <b>Вправо</b> — интересно, <b>влево</b> — нет. На компьютере — стрелки <span class="kbd">←</span> <span class="kbd">→</span>. Нажмите на карточку, чтобы открыть профиль.</li>
+      <li>Если студент тоже отметил вакансию — мэтч, и открываются контакты.</li>
+      <li>Можно завести <b>свою вакансию</b> — в списке вакансий сверху.</li>
+      <li>Все студенты, отзывы и контакты <b>вымышленные</b>.</li>
+    </ul>
+    <p class="small muted" style="margin:0">Потом — 3 коротких вопроса, 1 минута. Ответ увидит только команда Winder.</p>
+    <button class="btn primary wide" id="introGo">Начать</button></div>`;
+  modal.hidden = false;
+  document.getElementById('introGo').onclick = () => { closeModal(); logEv('начал демо (приветствие)'); };
+}
+
+function maybeOfferFeedback() {
+  if (FB.offered || FB.sent) return;
+  FB.offered = true;
+  document.getElementById('fbPill').hidden = false;
+  toast('Есть минута? Ответьте на 3 вопроса — кнопка вверху');
+}
+setTimeout(maybeOfferFeedback, 120000);
+document.getElementById('fbPill').onclick = openFeedback;
+
+function openFeedback() {
+  logEv('открыл 3 вопроса');
+  const t = document.querySelector('.toast'); if (t) t.remove(); // подсказка не должна перекрывать кнопки
+  const payDone = LOG.pay && !LOG.pay.skipped;
+  let q1 = null;
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box">
+    <h3>3 вопроса о демо</h3>
+    <p class="small muted" style="margin:0">Честный ответ полезнее вежливого — мы проверяем идею, а не продаём.</p>
+    <div><div class="fl">1. Вы бы связались с кем-то из этих студентов, хотя у них нет резюме?</div>
+      <div class="opts-col">${Q1.map((t, i) => `<button type="button" class="opt" data-q1="${i}">${t}</button>`).join('')}</div></div>
+    <div><div class="fl">2. Чего не хватило, чтобы решить? Что было лишним?</div>
+      <textarea id="fbQ2" placeholder="Пара слов — что вы хотели бы видеть о кандидате"></textarea></div>
+    ${payDone
+      ? `<p class="small muted" style="margin:0">3. Про оплату вы уже ответили: ${esc(LOG.pay.model)}${LOG.pay.amount ? ', ' + esc(LOG.pay.amount) + ' ₽' : ''}. Спасибо!</p>`
+      : `<div><div class="fl">3. Сколько в месяц было бы нормально платить за такой подбор, ₽?</div>
+          <input class="inp" id="fbQ3" type="number" inputmode="numeric" min="0" placeholder="Ваша сумма">
+          <label class="chk"><input type="checkbox" id="fbNoPay"> Не стал(а) бы платить</label></div>`}
+    <div><div class="fl">Компания и ваша роль <span class="muted small">— необязательно</span></div>
+      <input class="inp" id="fbWho" maxlength="80" placeholder="Например: кофейня, управляющий"></div>
+    <label class="chk"><input type="checkbox" id="fbAttach" checked> Приложить, что я смотрел в демо (без личных данных)</label>
+    <button class="btn primary wide" id="fbSend">Готово</button>
+    <button class="btn wide" id="fbLater">Позже</button></div>`;
+  modal.hidden = false;
+  modal.querySelectorAll('[data-q1]').forEach(b => b.onclick = () => {
+    modal.querySelectorAll('[data-q1]').forEach(x => x.classList.toggle('on', x === b)); q1 = +b.dataset.q1;
+  });
+  const noPay = document.getElementById('fbNoPay');
+  if (noPay) noPay.onchange = () => { document.getElementById('fbQ3').disabled = noPay.checked; };
+  document.getElementById('fbLater').onclick = closeModal;
+  document.getElementById('fbSend').onclick = () => {
+    if (q1 === null) { toast('Ответьте хотя бы на первый вопрос'); return; }
+    const q2 = document.getElementById('fbQ2').value.trim();
+    const who = document.getElementById('fbWho').value.trim();
+    const lines = ['ОТВЕТ НА ДЕМО WINDER', 'Связался бы со студентом без резюме: ' + Q1[q1]];
+    if (q2) lines.push('Чего не хватило / что лишнее: ' + q2);
+    if (!payDone) {
+      const q3 = document.getElementById('fbQ3').value.trim();
+      lines.push('Готов платить в месяц: ' + (noPay.checked ? 'не стал(а) бы платить' : q3 ? q3 + ' ₽' : 'не указал(а)'));
+    }
+    if (who) lines.push('Кто: ' + who);
+    FB.sent = true;
+    document.getElementById('fbPill').hidden = true;
+    logEv('ответил на 3 вопроса: ' + Q1[q1]);
+    const text = lines.join('\n') + (document.getElementById('fbAttach').checked ? '\n\n' + summaryText() : '');
+    showFeedbackDone(text);
+  };
+}
+
+function showFeedbackDone(text) {
+  modal.innerHTML = `<div class="modal-box">
+    <h3>Спасибо!</h3>
+    <p style="margin:0">Осталось отправить ответ Ивану — выберите, как удобнее:</p>
+    <button class="btn primary wide" id="fbCopy">Скопировать — вставлю в чат Zoom</button>
+    <button class="btn ghost wide" id="fbTg">Скопировать и написать Ивану в Telegram</button>
+    <details><summary>Показать текст ответа</summary><textarea readonly class="fb-text">${esc(text)}</textarea></details>
+    <button class="btn wide" id="fbClose">Закрыть</button></div>`;
+  modal.hidden = false;
+  document.getElementById('fbCopy').onclick = () => copyText(text).then(() => toast('Скопировано — вставьте в чат звонка'));
+  document.getElementById('fbTg').onclick = () => copyText(text).then(() => {
+    toast('Скопировано — вставьте текст в чат с Иваном');
+    if (inTelegram && tg.openTelegramLink) tg.openTelegramLink(FOUNDER_TG); else window.open(FOUNDER_TG, '_blank');
+  });
+  document.getElementById('fbClose').onclick = closeModal;
+}
+
+// Клавиатура для показа на компьютере (Zoom): ← нет, → интересно, Esc — закрыть окно
+document.addEventListener('keydown', e => {
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  // если фокус остался на списке вакансий — забираем стрелки себе, чтобы не открылась «Своя вакансия»
+  if (document.activeElement === sel && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); sel.blur(); }
+  if (e.key === 'Escape') { if (!modal.hidden) closeModal(); else if (!sheet.hidden) closeProfile(); return; }
+  if (!modal.hidden || !sheet.hidden || !overlay.hidden || state.tab !== 'feed' || state.view !== 'swipe') return;
+  if (e.key === 'ArrowRight') decide('like');
+  if (e.key === 'ArrowLeft') decide('nope');
+});
 
 let toastTimer;
 function toast(msg) {
@@ -1539,6 +1663,7 @@ renderFeed();
   text: `<b>${byId(sid).name}</b> отметил(а) вашу вакансию «${VACANCIES[0].title}»`,
 }));
 updateBell();
+showIntro();
 // Через 45 секунд — «живой» отклик от студента, который подходит под текущую вакансию
 setTimeout(() => {
   const v = vac();
