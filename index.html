@@ -434,7 +434,7 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
 .ntype.bot { background: var(--accent); }
 
 /* демо по ссылке: приветствие и 3 вопроса */
-.fb-pill { margin-left: auto; padding: 8px 12px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 12.5px; font-weight: 700; box-shadow: var(--shadow); animation: pop .5s cubic-bezier(.2, .9, .25, 1.3); }
+.fb-pill { white-space: nowrap; flex: none; margin-left: auto; padding: 8px 12px; border-radius: 12px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; font-size: 12.5px; font-weight: 700; box-shadow: var(--shadow); animation: pop .5s cubic-bezier(.2, .9, .25, 1.3); }
 .fb-pill:not([hidden]) + .bell { margin-left: 8px; }
 .opts-col { display: flex; flex-direction: column; gap: 6px; }
 .chk { display: flex; gap: 8px; align-items: center; font-size: 13px; margin-top: 8px; cursor: pointer; }
@@ -443,6 +443,33 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
 .intro .brand { margin-bottom: 2px; }
 .kbd { display: inline-block; padding: 0 5px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; }
 
+.steps { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.steps li { display: flex; gap: 11px; align-items: flex-start; font-size: 14px; line-height: 1.4; }
+.steps .num { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.steps .muted { display: block; font-size: 12.5px; margin-top: 1px; }
+.act { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.act > span { font-size: 11px; font-weight: 600; color: var(--muted); }
+.toprow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.rate { flex: none; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 99px; background: var(--surface-2); white-space: nowrap; }
+.ver { color: var(--like); font-weight: 600; font-size: 12px; }
+.ver-badge { display: inline-block; margin-top: 3px; font-size: 11.5px; font-weight: 700; color: var(--like); background: color-mix(in srgb, var(--like) 12%, transparent); border-radius: 8px; padding: 2px 7px; }
+/* гид по меню: подсветка элемента и подсказка по шагам */
+#tour { position: fixed; inset: 0; z-index: 70; }
+#tour[hidden] { display: none; }
+.tour-spot { position: fixed; border-radius: 16px; box-shadow: 0 0 0 2px var(--accent), 0 0 0 9999px rgba(8, 8, 18, .66); transition: top .35s ease, left .35s ease, width .35s ease, height .35s ease; pointer-events: none; }
+.tour-spot::after { content: ""; position: absolute; inset: -6px; border-radius: 20px; border: 2px solid var(--accent); opacity: 0; animation: tourPulse 1.6s ease-out infinite; }
+@keyframes tourPulse { 0% { opacity: .9; transform: scale(.96); } 100% { opacity: 0; transform: scale(1.08); } }
+.tour-tip { position: fixed; width: min(320px, calc(100vw - 24px)); background: var(--bg); color: var(--text); border-radius: 18px; padding: 14px 16px 12px; box-shadow: var(--shadow-lg); transition: top .35s ease, left .35s ease; }
+.tour-tip .tstep { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .04em; text-transform: uppercase; }
+.tour-tip h4 { margin: 4px 0 4px; font-size: 16px; letter-spacing: -.01em; }
+.tour-tip p { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--text); }
+.tour-dots { display: flex; gap: 4px; margin-top: 10px; }
+.tour-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line); transition: width .25s; }
+.tour-dots i.on { width: 16px; background: var(--accent); }
+.tour-nav { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.tour-nav .btn { padding: 9px 14px; font-size: 13.5px; }
+.tour-nav .grow { flex: 1; }
+.tour-skip { font-size: 12.5px; color: var(--muted); font-weight: 600; padding: 6px 2px; }
 .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); z-index: 50; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: calc(100% - 32px); text-align: center; box-shadow: var(--shadow); animation: fade .2s; }
 </style>
 </head>
@@ -452,7 +479,7 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
     <div class="brand">
       <span class="logo" id="logo">Winder</span>
       <span class="pill">ДЕМО</span>
-      <button class="fb-pill" id="fbPill" hidden>3 вопроса · 1 мин</button>
+      <button class="fb-pill" id="fbPill">3 вопроса · 1 мин</button>
       <button class="bell" id="bellBtn" aria-label="Уведомления"><svg class="ico" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 6 2 7H4c.5-1 2-3 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot-count" id="bellBadge" hidden></span></button>
     </div>
     <div class="vacbar">
@@ -475,10 +502,10 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
     <section class="screen" id="screen-feed">
       <div class="deck" id="deck"></div>
       <div class="actions" id="feedActions">
-        <button class="btn-round small" id="btnUndo" aria-label="Вернуть последнего"><svg class="ico" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
-        <button class="btn-round nope" id="btnNope" aria-label="Пропустить"><svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
-        <button class="btn-round like" id="btnLike" aria-label="Интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button>
-        <button class="btn-round small" id="btnInfo" aria-label="Открыть профиль"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
+        <div class="act"><button class="btn-round small" id="btnUndo" aria-label="Вернуть последнего"><svg class="ico" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><span>Назад</span></div>
+        <div class="act"><button class="btn-round nope" id="btnNope" aria-label="Пропустить"><svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button><span>Не подходит</span></div>
+        <div class="act"><button class="btn-round like" id="btnLike" aria-label="Интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><span>Интересно</span></div>
+        <div class="act"><button class="btn-round small" id="btnInfo" aria-label="Открыть профиль"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button><span>Профиль</span></div>
       </div>
       <div class="list" id="list" hidden></div>
     </section>
@@ -503,6 +530,7 @@ body { background: radial-gradient(120% 55% at 50% -12%, color-mix(in srgb, var(
 <div id="overlay" hidden></div>
 <div id="modal" hidden></div>
 <div id="banner" class="banner" role="status"></div>
+<div id="tour" hidden><div class="tour-spot" id="tourSpot"></div><div class="tour-tip" id="tourTip" role="dialog" aria-live="polite"></div></div>
 
 <script>
 // ---------- Данные демо (все люди вымышленные) ----------
@@ -525,8 +553,8 @@ const STUDENTS = [
   { id: 'a1', name: 'Алина', age: 19, uni: 'РЭУ · 2 курс · маркетинг', hue: 330, handle: '@alina_demo',
     schedule: ['Вечер будни', 'Выходные'], format: ['Офлайн', 'Удалённо'], skills: ['Организация', 'Общение с людьми', 'Соцсети'],
     pay: 'от 350 ₽/час', completeness: 95, likes: ['v2', 'v1'],
-    exp: [{ t: 'Студенческий форум на 300 участников', r: 'Координатор волонтёров', c: 2 },
-          { t: 'Школа актива', r: 'Куратор группы', c: 1 }],
+    exp: [{ t: 'Студенческий форум на 300 участников', r: 'Координатор волонтёров', c: 2, v: 'организатор форума' },
+          { t: 'Школа актива', r: 'Куратор группы', c: 1, v: 'студсовет' }],
     self: [5, 4, 3, 2, 3],
     reviews: [
       { a: 'Event-агентство', rel: 'Помощник на 3 мероприятиях', s: [5, 5, 4, 3, 3], rec: true, t: 'Координировала волонтёров на площадке: замены, инструктаж, тайминг. Ни одного пустого поста.' },
@@ -537,7 +565,7 @@ const STUDENTS = [
   { id: 'm2', name: 'Максим', age: 20, uni: '3 курс · экономика', hue: 210, handle: '@maxim_demo',
     schedule: ['Выходные', 'Утро будни'], format: ['Офлайн'], skills: ['Касса/продажи', 'Стрессоустойчивость', 'Общение с людьми'],
     pay: 'от 300 ₽/час', completeness: 80, likes: ['v1'],
-    exp: [{ t: 'Летнее кафе', r: 'Бариста (сезон)', c: 1 }, { t: 'Городской фестиваль', r: 'Промоутер', c: 1 }],
+    exp: [{ t: 'Летнее кафе', r: 'Бариста (сезон)', c: 1, v: 'управляющий кафе' }, { t: 'Городской фестиваль', r: 'Промоутер', c: 1, v: 'организатор фестиваля' }],
     self: [2, 3, 5, 3, 2],
     reviews: [
       { a: 'Летнее кафе', rel: 'Сезон, 3 мес.', s: [3, 4, 5, 3, 2], rec: true, t: '' },
@@ -546,14 +574,14 @@ const STUDENTS = [
   { id: 's3', name: 'Соня', age: 18, uni: '1 курс · дизайн', hue: 25, handle: '@sonya_demo',
     schedule: ['Гибкий'], format: ['Удалённо'], skills: ['Дизайн', 'Соцсети', 'Тексты'],
     pay: 'по договорённости', completeness: 70, likes: ['v3'],
-    exp: [{ t: 'Студенческий клуб', r: 'Оформление соцсетей', c: 1 }, { t: 'Студенческий театр', r: 'Афиши и анонсы', c: 0 }],
+    exp: [{ t: 'Студенческий клуб', r: 'Оформление соцсетей', c: 1, v: 'руководитель клуба' }, { t: 'Студенческий театр', r: 'Афиши и анонсы', c: 0 }],
     self: [2, 3, 3, 2, 5],
     reviews: [{ a: 'Небольшой магазин одежды', rel: 'Разовый проект', s: [2, 3, 4, 2, 5], rec: true, t: '' }] },
   { id: 't4', name: 'Тимур', age: 21, uni: '4 курс · прикладная информатика', hue: 170, handle: '@timur_demo',
     schedule: ['Вечер будни', 'Выходные'], format: ['Удалённо', 'Офлайн'], skills: ['Аналитика', 'Excel', 'Тайм-менеджмент', 'Организация'],
     pay: 'от 400 ₽/час', completeness: 90, likes: ['v2'],
-    exp: [{ t: 'Кейс-чемпионат по аналитике', r: 'Финалист, капитан команды', c: 3 },
-          { t: 'Студенческий фестиваль', r: 'Техническая команда', c: 2 }],
+    exp: [{ t: 'Кейс-чемпионат по аналитике', r: 'Финалист, капитан команды', c: 3, v: 'организатор чемпионата' },
+          { t: 'Студенческий фестиваль', r: 'Техническая команда', c: 2, v: 'студсовет' }],
     self: [2, 3, 4, 5, 2],
     reviews: [
       { a: 'Онлайн-школа', rel: 'Отчёты по продажам, 2 мес.', s: [3, 3, 5, 5, 2], rec: true, t: 'Собрал дашборд, которым пользуемся до сих пор. Сказал — сделал.' },
@@ -563,7 +591,7 @@ const STUDENTS = [
   { id: 'd5', name: 'Даша', age: 19, uni: '2 курс · журналистика', hue: 280, handle: '@dasha_demo',
     schedule: ['Гибкий'], format: ['Удалённо'], skills: ['Тексты', 'Соцсети', 'Общение с людьми'],
     pay: 'по договорённости', completeness: 85, likes: ['v3'],
-    exp: [{ t: 'Студенческое медиа', r: 'Редактор рубрики', c: 3 }],
+    exp: [{ t: 'Студенческое медиа', r: 'Редактор рубрики', c: 3, v: 'главный редактор' }],
     self: [3, 4, 3, 3, 4],
     reviews: [
       { a: 'Онлайн-школа', rel: 'Тексты для соцсетей, 3 мес.', s: [3, 4, 5, 3, 4], rec: true, t: 'Сдаёт в срок, правки принимает без обид. Пишет живо.' },
@@ -578,7 +606,7 @@ const STUDENTS = [
   { id: 'p7', name: 'Полина', age: 22, uni: 'магистратура · финансы', hue: 50, handle: '@polina_demo',
     schedule: ['Утро будни', 'День будни'], format: ['Офлайн', 'Удалённо'], skills: ['Excel', 'Аналитика', 'Касса/продажи'],
     pay: 'от 350 ₽/час', completeness: 90, likes: ['v1'],
-    exp: [{ t: 'Студенческий научный кружок', r: 'Отвечала за отчёты', c: 2 }, { t: 'Магазин у дома', r: 'Продавец-кассир', c: 1 }],
+    exp: [{ t: 'Студенческий научный кружок', r: 'Отвечала за отчёты', c: 2, v: 'преподаватель, руководитель кружка' }, { t: 'Магазин у дома', r: 'Продавец-кассир', c: 1, v: 'владелец магазина' }],
     self: [3, 3, 5, 4, 2],
     reviews: [
       { a: 'Магазин у дома', rel: 'Кассир, 6 мес.', s: [3, 4, 5, 4, 2], rec: true, t: 'Касса всегда сходилась. Спокойно общается даже с конфликтными покупателями.' },
@@ -588,7 +616,7 @@ const STUDENTS = [
   { id: 'r8', name: 'Артём', age: 18, uni: '1 курс · гостиничное дело', hue: 0, handle: '@artem_demo',
     schedule: ['Выходные'], format: ['Офлайн'], skills: ['Общение с людьми', 'Касса/продажи', 'Стрессоустойчивость'],
     pay: 'от 300 ₽/час', completeness: 85, likes: ['v1', 'v2'],
-    exp: [{ t: 'Летний лагерь', r: 'Вожатый отряда', c: 2 }, { t: 'Школьный выпускной', r: 'Организатор', c: 1 }],
+    exp: [{ t: 'Летний лагерь', r: 'Вожатый отряда', c: 2, v: 'директор лагеря' }, { t: 'Школьный выпускной', r: 'Организатор', c: 1, v: 'классный руководитель' }],
     self: [4, 5, 4, 2, 3],
     reviews: [
       { a: 'Кофейня', rel: 'Смены на выходных, 3 мес.', s: [4, 5, 4, 3, 4], rec: true, t: 'Гости его обожают. Очередь в час пик держит спокойно.' },
@@ -599,7 +627,7 @@ const STUDENTS = [
   { id: 'v9', name: 'Вика', age: 20, uni: '3 курс · реклама', hue: 300, handle: '@vika_demo',
     schedule: ['Вечер будни', 'Выходные'], format: ['Офлайн', 'Удалённо'], skills: ['Соцсети', 'Дизайн', 'Организация'],
     pay: 'от 350 ₽/час', completeness: 85, likes: ['v3'],
-    exp: [{ t: 'Студенческий фестиваль', r: 'SMM фестиваля', c: 2 }],
+    exp: [{ t: 'Студенческий фестиваль', r: 'SMM фестиваля', c: 2, v: 'организатор фестиваля' }],
     self: [5, 5, 4, 4, 5],
     reviews: [
       { a: 'Онлайн-школа', rel: 'Сторис, 1 мес.', s: [3, 4, 3, 3, 4], rec: true, t: '' },
@@ -608,7 +636,7 @@ const STUDENTS = [
   { id: 'i10', name: 'Илья', age: 21, uni: '3 курс · бизнес-информатика', hue: 230, handle: '@ilya_demo',
     schedule: ['День будни', 'Вечер будни'], format: ['Удалённо'], skills: ['Тексты', 'Аналитика', 'Excel'],
     pay: 'от 350 ₽/час', completeness: 65, likes: [],
-    exp: [{ t: 'Учебный проект для малого бизнеса', r: 'Аналитик', c: 1 }],
+    exp: [{ t: 'Учебный проект для малого бизнеса', r: 'Аналитик', c: 1, v: 'преподаватель' }],
     self: [2, 2, 4, 5, 3],
     reviews: [{ a: 'Интернет-магазин', rel: 'Разовый проект', s: [2, 3, 4, 4, 3], rec: true, t: '' }] },
 ];
@@ -773,6 +801,9 @@ const meter = (label, hit, total) => `<div class="meter"><span>${label}</span>
   <div class="segs">${total ? Array.from({ length: total }, (_, i) => `<i class="${i < hit ? 'on' : ''}"></i>`).join('') : '<i class="on"></i>'}</div>
   <b>${total ? hit + ' из ' + total : '—'}</b></div>`;
 
+// Ставка студента: «от 350 ₽/час» или «по договорённости»
+const rateText = s => /₽/.test(s.pay) ? s.pay : 'ставка ' + s.pay;
+
 function cardHTML(s, f, v) {
   const e = s.exp[0];
   // Одна строка фактов вместо россыпи чипов: метро + требования вакансии (есть — ✓, нет — зачёркнуто)
@@ -785,11 +816,11 @@ function cardHTML(s, f, v) {
       <span class="stamp like">ИНТЕРЕСНО</span><span class="stamp nope">НЕТ</span>
     </div>
     <div class="body">
-      ${ratingHTML(s)}
+      <div class="toprow">${ratingHTML(s)}<span class="rate">💰 ${rateText(s)}</span></div>
+      <div class="kv"><span class="lbl">Опыт</span>
+        <div class="exp-line"><b>${e.r}</b> — ${e.t}</div>${e.v ? `<span class="ver-badge">✓ подтвердил ${e.v}</span>` : '<span class="small muted">опыт не подтверждён</span>'}</div>
       <div class="meters">${meter('График', f.schedHit, f.schedTotal)}${meter('Навыки', f.skillHit, f.skillTotal)}${meter('Требования', f.reqHit, f.reqTotal)}</div>
       <div class="facts-line">${facts}</div>
-      <div class="kv"><span class="lbl">Опыт</span>
-        <div class="exp-line"><b>${e.r}</b> — ${e.t} ${e.c ? `<span class="ok">✓ ${e.c}</span>` : ''}</div></div>
       <div class="kv"><span class="lbl">Сильные стороны · самооценка</span>
         <div class="exp-line">${topSelf(s).join(' · ')}</div></div>
     </div>`;
@@ -899,7 +930,7 @@ function renderList() {
         <div class="ava" style="background:${grad(s.hue)}">${s.name[0]}</div>
         <div class="grow">
           <div class="name">${s.name}, ${s.age}</div>
-          <div class="small muted">${st.n ? `${st.rec}% наняли бы снова` : 'новичок, отзывов нет'}</div>
+          <div class="small muted">${st.n ? `${st.rec}% наняли бы снова` : 'новичок, отзывов нет'} · <b style="color:var(--text)">${rateText(s)}</b></div>
           <div class="small muted">м. ${s.metro} · совпадение <b style="color:var(--text);white-space:nowrap">${f.schedHit + f.skillHit + f.reqHit} из ${f.schedTotal + f.skillTotal + f.reqTotal}</b></div>
           ${status}
         </div>${btns}</div>`;
@@ -1088,6 +1119,7 @@ function openProfile(sid) {
   } else {
     reviewsBlock = ratingHTML(s) + s.reviews.map(r => `<div class="review">
         <div class="who">${r.a} · ${r.rel} · ${r.rec ? '👍 нанял(а) бы снова' : '— не уверен(а), что нанял(а) бы снова'}</div>
+        <span class="ver">✓ найм подтверждён через Winder</span>
         <div>${esc(r.t)}</div></div>`).join('');
   }
 
@@ -1109,7 +1141,7 @@ function openProfile(sid) {
 
       <div class="panel"><h3>Доступность</h3>
         <div class="row">${s.schedule.map(x => chip(x)).join('')}${s.format.map(x => chip(x)).join('')}</div>
-        <p class="small muted">Желаемая оплата: ${s.pay}</p></div>
+        <p class="small muted">Желаемая оплата: <b style="color:var(--text)">${s.pay}</b></p></div>
 
       <div class="panel"><h3>Навыки</h3>
         <div class="row">${s.skills.map(x => chip(x, v.skills.includes(x))).join('')}</div>
@@ -1129,8 +1161,9 @@ function openProfile(sid) {
         <p class="small muted">Указано студентом. Права и медкнижку работодатель проверяет при выходе на работу.</p></div>
 
       <div class="panel"><h3>Опыт</h3>
-        ${s.exp.map(e => `<div class="mrow"><div class="grow"><div class="name">${e.r}</div><div class="small muted">${e.t}</div></div>
-          ${e.c ? `<span class="ok">✓ ${peopleWord(e.c)}</span>` : '<span class="status">не подтверждено</span>'}</div>`).join('')}</div>
+        ${s.exp.map(e => `<div class="mrow"><div class="grow"><div class="name">${e.r}</div><div class="small muted">${e.t}</div>
+          ${e.v ? `<span class="ver-badge">✓ подтвердил ${e.v}</span>${e.c > 1 ? `<div class="small muted">и ещё ${e.c - 1} ${plural(e.c - 1, 'участник', 'участника', 'участников')}</div>` : ''}` : '<span class="status">не подтверждено</span>'}</div></div>`).join('')}
+        <p class="small muted">Подтверждает не однокурсник, а тот, кто отвечал за проект: организатор, преподаватель, студсовет.</p></div>
 
       <div class="panel"><h3>Сильные стороны</h3>
         <div class="legend"><span class="ls">Тест (самооценка)</span>${st.n ? '<span class="lp">По отзывам работодателей</span>' : ''}</div>
@@ -1299,7 +1332,7 @@ function renderAbout() {
       <li>Если студент тоже отметил вашу вакансию — мэтч, и обеим сторонам открываются контакты.</li>
       <li>Профиль строится на опыте в проектах и мероприятиях, тесте и отзывах, а не на резюме.</li></ul></div>
     <div class="panel"><h3>Почему профилю можно доверять</h3><ul class="rules">
-      <li>Опыт подтверждают другие участники проекта.</li>
+      <li>Опыт подтверждает тот, кто отвечал за проект: организатор, преподаватель или студсовет. В профиле видно, кто именно.</li>
       <li>Отзыв оставляет только работодатель после подтверждённого мэтча — и только когда подтвердил, что студент вышел на работу.</li>
       <li>Переписка — в привычном Telegram. Winder знакомит и потом уточняет одной кнопкой, чем закончилось.</li>
       <li>Текст отзывов публичен не раньше третьего отзыва; доля «наняли бы снова» видна сразу.</li>
@@ -1307,9 +1340,13 @@ function renderAbout() {
       <li>Порядок в ленте — по понятным правилам (график, навыки, требования вакансии, заполненность), не ИИ.</li>
       <li>Практичное (метро, права, медкнижка, самозанятость) указывает студент; документы проверяются при выходе на работу.</li>
       <li>Профили и отзывы проходят ручную модерацию.</li></ul></div>
+    <button class="btn ghost wide" id="aboutTour">Гид по меню — где что находится</button>
+    <button class="btn ghost wide" id="aboutHow">Показать инструкцию ещё раз</button>
     <button class="btn primary wide" id="aboutFb">Ответить на 3 вопроса о демо</button>
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
   document.getElementById('aboutFb').onclick = openFeedback;
+  document.getElementById('aboutHow').onclick = showIntro;
+  document.getElementById('aboutTour').onclick = startTour;
   document.getElementById('resetDemo').onclick = () => {
     state.decisions = {}; state.matches = []; state.reviewed = {}; state.seenMatches = 0;
     state.filters = new Set(); state.history = []; state.checkins = {}; updateBadge(); renderFeed(); toast('Демо сброшено');
@@ -1548,23 +1585,26 @@ function showIntro() {
   modal.className = 'modal';
   modal.innerHTML = `<div class="modal-box intro">
     <div class="brand"><span class="logo">Winder</span><span class="pill">ДЕМО</span></div>
-    <h3 style="font-size:20px;letter-spacing:-.02em">Студенты на подработку — по опыту и отзывам, а не по резюме</h3>
-    <ul class="rules">
-      <li>Перед вами студенты под вакансию. <b>Вправо</b> — интересно, <b>влево</b> — нет. На компьютере — стрелки <span class="kbd">←</span> <span class="kbd">→</span>. Нажмите на карточку, чтобы открыть профиль.</li>
-      <li>Если студент тоже отметил вакансию — мэтч, и открываются контакты.</li>
-      <li>Можно завести <b>свою вакансию</b> — в списке вакансий сверху.</li>
-      <li>Все студенты, отзывы и контакты <b>вымышленные</b>.</li>
-    </ul>
-    <p class="small muted" style="margin:0">Потом — 3 коротких вопроса, 1 минута. Ответ увидит только команда Winder.</p>
-    <button class="btn primary wide" id="introGo">Начать</button></div>`;
+    <h3 style="font-size:20px;letter-spacing:-.02em;margin-bottom:0">Как найти студента на подработку</h3>
+    <p class="small muted" style="margin:0">По опыту и отзывам, а не по резюме. 5 шагов:</p>
+    <ol class="steps">
+      <li><span class="num">1</span><span><b>Выберите вакансию</b> в списке сверху — или создайте свою там же.</span></li>
+      <li><span class="num">2</span><span><b>Смотрите студентов.</b> На карточке — опыт и кто его подтвердил, отзывы работодателей, ставка в час, метро.<span class="muted">Нажмите на карточку — откроется полный профиль.</span></span></li>
+      <li><span class="num">3</span><span><b>Решите:</b> подходит — зелёная ✓, нет — красный ✕.<span class="muted">Можно смахнуть карточку вправо или влево. На компьютере — стрелки <span class="kbd">→</span> <span class="kbd">←</span>.</span></span></li>
+      <li><span class="num">4</span><span><b>Мэтч</b> — когда студент тоже откликнулся на вашу вакансию. Откроется его Telegram — договаривайтесь напрямую.<span class="muted">Все мэтчи — во вкладке «Мэтчи» внизу.</span></span></li>
+      <li><span class="num">5</span><span><b>После работы</b> бот спросит, как всё прошло, — отзыв в один клик.</span></li>
+    </ol>
+    <p class="small muted" style="margin:0">Все студенты вымышленные. Кнопка <b>«3 вопроса»</b> вверху — ваше мнение о демо, 1 минута, в любой момент. Инструкция и гид — во вкладке «О сервисе».</p>
+    <button class="btn primary wide" id="introTour">Показать, где что — 30 секунд</button>
+    <button class="btn ghost wide" id="introGo">Начну сам</button></div>`;
   modal.hidden = false;
-  document.getElementById('introGo').onclick = () => { closeModal(); logEv('начал демо (приветствие)'); };
+  document.getElementById('introTour').onclick = () => { closeModal(); logEv('начал демо (инструкция → гид)'); startTour(); };
+  document.getElementById('introGo').onclick = () => { closeModal(); logEv('начал демо (инструкция, без гида)'); };
 }
 
 function maybeOfferFeedback() {
   if (FB.offered || FB.sent) return;
   FB.offered = true;
-  document.getElementById('fbPill').hidden = false;
   toast('Есть минута? Ответьте на 3 вопроса — кнопка вверху');
 }
 setTimeout(maybeOfferFeedback, 120000);
@@ -1638,6 +1678,12 @@ function showFeedbackDone(text) {
 
 // Клавиатура для показа на компьютере (Zoom): ← нет, → интересно, Esc — закрыть окно
 document.addEventListener('keydown', e => {
+  if (TOUR.on) {
+    if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); tourGo(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); tourGo(-1); }
+    if (e.key === 'Escape') endTour(true);
+    return;
+  }
   if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
   // если фокус остался на списке вакансий — забираем стрелки себе, чтобы не открылась «Своя вакансия»
   if (document.activeElement === sel && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); sel.blur(); }
@@ -1646,6 +1692,94 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') decide('like');
   if (e.key === 'ArrowLeft') decide('nope');
 });
+
+// ---------- Гид по меню: по шагам подсвечивает, что где находится ----------
+const TOUR_STEPS = [
+  { el: () => document.querySelector('.vac'), t: 'Ваша вакансия',
+    d: 'Под неё подобраны студенты. Нажмите — выберите другую или создайте свою.' },
+  { el: () => document.querySelector('.icon-seg'), t: 'Карточки или список',
+    d: 'Смотрите студентов по одному, как в Tinder, или сразу всех списком.' },
+  { el: () => document.getElementById('filterBtn'), t: 'Фильтры',
+    d: 'Оставьте только тех, у кого есть медкнижка, права, самозанятость или кто готов работать в вашем районе.' },
+  { el: () => document.querySelector('#deck .card:not(.behind)') || document.getElementById('deck'), t: 'Карточка студента',
+    d: 'Ставка в час, опыт и кто его подтвердил, совпадение с вакансией. Нажмите на карточку — откроется полный профиль с отзывами.' },
+  { el: () => document.getElementById('feedActions'), t: 'Решение',
+    d: '✓ — интересно, ✕ — не подходит. Можно и смахнуть карточку вправо или влево. «Назад» вернёт последнего.' },
+  { el: () => document.getElementById('bellBtn'), t: 'Уведомления',
+    d: 'Здесь видно, кто из студентов сам откликнулся на вашу вакансию.' },
+  { el: () => document.querySelector('.tabs [data-tab="matches"]'), t: 'Мэтчи',
+    d: 'Когда интерес взаимный, студент появится здесь вместе с Telegram. Договаривайтесь напрямую, а после работы оставьте отзыв в один клик.' },
+  { el: () => document.querySelector('.tabs [data-tab="about"]'), t: 'О сервисе',
+    d: 'Почему профилям можно доверять. Здесь же можно снова открыть этот гид.' },
+  { el: () => document.getElementById('fbPill'), t: 'Ваше мнение',
+    d: '3 вопроса о демо, 1 минута. Для нас это самое ценное.' },
+];
+const TOUR = { on: false, i: 0 };
+const tourEl = document.getElementById('tour'), spotEl = document.getElementById('tourSpot'), tipEl = document.getElementById('tourTip');
+const visible = el => { if (!el) return false; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; };
+
+function startTour() {
+  // гид показывает главный экран: лента, режим карточек, без открытых окон
+  if (state.tab !== 'feed') document.querySelector('.tabs [data-tab="feed"]').click();
+  if (state.view !== 'swipe') { state.view = 'swipe'; renderFeed(); }
+  if (!sheet.hidden) closeProfile();
+  if (!modal.hidden) closeModal();
+  TOUR.on = true; TOUR.i = 0;
+  tourEl.hidden = false;
+  logEv('гид: начал');
+  tourShow(0, 1);
+}
+
+function tourGo(dir) {
+  const n = TOUR.i + dir;
+  if (n >= TOUR_STEPS.length) { endTour(false); return; }
+  if (n < 0) return;
+  tourShow(n, dir);
+}
+
+// dir — куда листаем: если элемента сейчас нет на экране, шаг пропускается
+function tourShow(i, dir) {
+  while (i >= 0 && i < TOUR_STEPS.length && !visible(TOUR_STEPS[i].el())) i += dir || 1;
+  if (i >= TOUR_STEPS.length) { endTour(false); return; }
+  if (i < 0) i = 0;
+  TOUR.i = i;
+  const step = TOUR_STEPS[i], last = i === TOUR_STEPS.length - 1;
+  tipEl.innerHTML = `<div class="tstep">Шаг ${i + 1} из ${TOUR_STEPS.length}</div>
+    <h4>${step.t}</h4><p>${step.d}</p>
+    <div class="tour-dots">${TOUR_STEPS.map((_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="tour-nav">
+      <button class="tour-skip" id="tourSkip">${last ? '' : 'Пропустить'}</button><span class="grow"></span>
+      ${i > 0 ? '<button class="btn" id="tourPrev">Назад</button>' : ''}
+      <button class="btn primary" id="tourNext">${last ? 'Начать' : 'Далее'}</button>
+    </div>`;
+  document.getElementById('tourNext').onclick = () => tourGo(1);
+  const pv = document.getElementById('tourPrev'); if (pv) pv.onclick = () => tourGo(-1);
+  document.getElementById('tourSkip').onclick = () => endTour(true);
+  tourPlace();
+  logEv('гид: шаг ' + (i + 1) + ' — ' + step.t);
+}
+
+// Рамка вокруг элемента; подсказка — под ним, а если места мало — над ним
+function tourPlace() {
+  if (!TOUR.on) return;
+  const el = TOUR_STEPS[TOUR.i].el();
+  if (!el) return;
+  const r = el.getBoundingClientRect(), pad = 6, vw = window.innerWidth, vh = window.innerHeight;
+  Object.assign(spotEl.style, { top: (r.top - pad) + 'px', left: (r.left - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
+  const tw = tipEl.offsetWidth, th = tipEl.offsetHeight, gap = 14;
+  let top = r.bottom + pad + gap;
+  if (top + th > vh - 12) top = r.top - pad - gap - th;   // не влезает снизу — ставим сверху
+  if (top < 12) top = Math.max(12, Math.min(vh - th - 12, r.top + r.height / 2 - th / 2)); // крупный элемент — по центру
+  const left = Math.min(Math.max(12, r.left + r.width / 2 - tw / 2), vw - tw - 12);
+  Object.assign(tipEl.style, { top: top + 'px', left: left + 'px' });
+}
+window.addEventListener('resize', tourPlace);
+
+function endTour(skipped) {
+  TOUR.on = false; tourEl.hidden = true;
+  logEv(skipped ? 'гид: пропустил на шаге ' + (TOUR.i + 1) : 'гид: прошёл до конца');
+  if (!skipped) toast('Готово! Начните с первой карточки');
+}
 
 let toastTimer;
 function toast(msg) {
