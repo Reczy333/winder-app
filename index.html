@@ -578,6 +578,18 @@ h2, h3, h4, .logo, .score b, .match-box h2 { font-family: -apple-system, BlinkMa
 .tour-spot { box-shadow: 0 0 0 2px var(--accent), 0 0 0 9999px rgba(0, 0, 0, .6); }
 .tour-dots i.on { background: var(--text); }
 .toast { border-radius: 980px; padding: 10px 18px; font-weight: 500; }
+/* ===================== Фирменный цвет Winder: кислотно-салатовый (08.11) ===================== */
+/* Салатовый на белом почти не читается (контраст ~1,2:1), поэтому на светлой теме надпись — чёрная на салатовом
+   «маркере», на тёмной — сама салатовая. Кнопка «Интересно» — салатовая заливка с чёрной галочкой на обеих темах. */
+:root { --brand: #C6FF00; --on-brand: #111111; }
+.logo { color: var(--text); background: linear-gradient(transparent 52%, var(--brand) 52%, var(--brand) 92%, transparent 92%); padding: 0 3px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo { color: var(--brand); background: none; padding: 0; }
+}
+:root[data-theme="dark"] .logo { color: var(--brand); background: none; padding: 0; }
+.btn-round.like, .mini.like { background: var(--brand); border-color: rgba(0, 0, 0, .08); color: var(--on-brand); }
+.btn-round.like .ico, .mini.like .ico { stroke-width: 2.6; }
+.stamp.like { background: var(--brand); color: var(--on-brand); }
 </style>
 </head>
 <body>
@@ -1789,7 +1801,7 @@ function showIntro() {
     <ol class="steps">
       <li><span class="num">1</span><span><b>Выберите вакансию</b> в списке сверху — или создайте свою там же.</span></li>
       <li><span class="num">2</span><span><b>Смотрите студентов.</b> На карточке — опыт и кто его подтвердил, отзывы работодателей и надёжность (приходил ли вовремя, не пропадал ли), ставка в час, метро.<span class="muted">Нажмите на карточку — откроется полный профиль.</span></span></li>
-      <li><span class="num">3</span><span><b>Решите:</b> подходит — синяя ✓, нет — ✕.<span class="muted">Можно смахнуть карточку вправо или влево. На компьютере — стрелки <span class="kbd">→</span> <span class="kbd">←</span>.</span></span></li>
+      <li><span class="num">3</span><span><b>Решите:</b> подходит — салатовая ✓, нет — ✕.<span class="muted">Можно смахнуть карточку вправо или влево. На компьютере — стрелки <span class="kbd">→</span> <span class="kbd">←</span>.</span></span></li>
       <li><span class="num">4</span><span><b>Мэтч</b> — когда студент тоже откликнулся на вашу вакансию. Откроется его Telegram — договаривайтесь напрямую.<span class="muted">Все мэтчи — во вкладке «Мэтчи» внизу.</span></span></li>
       <li><span class="num">5</span><span><b>После работы</b> бот спросит, как всё прошло, — отзыв в один клик.</span></li>
     </ol>
