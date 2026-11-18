@@ -659,6 +659,24 @@ body { background: var(--bg); }
 .tour-spot::after { border-color: var(--brand); }
 .tour-tip .tstep { color: var(--accent); }
 .inp:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+/* ===================== Студент (18.11): вакансии свайпами, мэтчи, профиль ===================== */
+#studentApp { height: 100dvh; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; }
+.role-pill { cursor: pointer; font-size: 10px; font-weight: 700; letter-spacing: .06em; white-space: nowrap; }
+.st-me { font-size: 12.5px; line-height: 1.35; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px; }
+.st-me b { color: var(--text); }
+.hero .vemoji { position: absolute; right: 16px; top: 50%; transform: translateY(-58%); font-size: 64px; line-height: 1; z-index: 2; filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .35)); }
+.sheet .hero .vemoji { font-size: 84px; right: 24px; }
+.card .hero .vemoji { font-size: 46px; top: 14px; right: 14px; transform: none; }
+.card .vhero { flex: 0 0 auto; min-height: 150px; }
+.card .vhero h2 { font-size: 24px; }
+.vhero > div { padding-right: 56px; }
+.sheet .vhero > div { padding-right: 92px; }
+.match-avas .ava.emo { font-size: 46px; }
+#stMatchesPage .bot { margin-top: 10px; }
+#stMatchesPage .choices { margin-top: 6px; }
+#stMatchesPage .lock { margin-top: 10px; }
+.ava.emo { font-size: 22px; }
 </style>
 </head>
 <body>
@@ -666,7 +684,7 @@ body { background: var(--bg); }
   <header class="top">
     <div class="brand">
       <span class="logo" id="logo">Winder</span>
-      <span class="pill">ДЕМО</span>
+      <button class="pill role-pill" data-role-switch aria-label="Сменить роль: работодатель или студент">ДЕМО ⇄</button>
       <button class="fb-pill" id="fbPill">3 вопроса · 1 мин</button>
       <button class="bell" id="bellBtn" aria-label="Уведомления"><svg class="ico" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 6 2 7H4c.5-1 2-3 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot-count" id="bellBadge" hidden></span></button>
     </div>
@@ -711,6 +729,40 @@ body { background: var(--bg); }
     <button data-tab="feed" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Кандидаты</button>
     <button data-tab="matches"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>Мэтчи<span class="badge" id="matchBadge" hidden></span></button>
     <button data-tab="about"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>О сервисе</button>
+  </nav>
+</div>
+
+<!-- Студент: вакансии свайпами, мэтчи и профиль. Тот же дизайн; в MVP студент работает в таком же мини-приложении -->
+<div id="studentApp" hidden>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">Winder</span>
+      <button class="pill role-pill" data-role-switch aria-label="Сменить роль: работодатель или студент">ДЕМО ⇄</button>
+      <button class="bell" id="stBell" aria-label="Приглашения и мэтчи"><svg class="ico" viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 6 2 7H4c.5-1 2-3 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot-count" id="stBellBadge" hidden></span></button>
+    </div>
+    <div class="st-me" id="stMe"></div>
+  </header>
+
+  <main>
+    <section class="screen" id="st-feed">
+      <div class="deck" id="stDeck"></div>
+      <div class="actions" id="stActions">
+        <div class="act"><button class="btn-round small" id="stUndo" aria-label="Вернуть последнюю"><svg class="ico" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><span>Назад</span></div>
+        <div class="act"><button class="btn-round nope" id="stNope" aria-label="Не интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button><span>Не интересно</span></div>
+        <div class="act"><button class="btn-round like" id="stLike" aria-label="Интересно"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><span>Интересно</span></div>
+        <div class="act"><button class="btn-round small" id="stInfo" aria-label="Подробнее о вакансии"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button><span>Подробнее</span></div>
+      </div>
+    </section>
+    <section class="screen" id="st-matches" hidden><div class="page" id="stMatchesPage"></div></section>
+    <section class="screen" id="st-profile" hidden><div class="page" id="stProfilePage"></div></section>
+    <section class="screen" id="st-about" hidden><div class="page" id="stAboutPage"></div></section>
+  </main>
+
+  <nav class="tabs" id="stTabs">
+    <button data-st-tab="feed" class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="7" y="3" width="12" height="16" rx="3"/><path d="M4 7.5V18a3 3 0 0 0 3 3h8"/></svg>Вакансии</button>
+    <button data-st-tab="matches"><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>Мэтчи<span class="badge" id="stMatchBadge" hidden></span></button>
+    <button data-st-tab="profile"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>Профиль</button>
+    <button data-st-tab="about"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>О сервисе</button>
   </nav>
 </div>
 
@@ -1295,6 +1347,7 @@ function updateBell(ring) {
 }
 let bannerTimer;
 function pushNotif(n, showBanner = true) {
+  if (ROLE === 'student') showBanner = false; // в режиме студента уведомления работодателя не всплывают
   NOTIFS.unshift({ ...n, at: n.at || Date.now(), read: false });
   updateBell(true);
   if (!showBanner) return;
@@ -1613,7 +1666,9 @@ function renderAbout() {
     <button class="btn ghost wide" id="aboutTour">Гид по меню — где что находится</button>
     <button class="btn ghost wide" id="aboutHow">Показать инструкцию ещё раз</button>
     <button class="btn primary wide" id="aboutFb">Ответить на 3 вопроса о демо</button>
+    <button class="btn ghost wide" id="aboutStudent">Посмотреть глазами студента</button>
     <button class="btn ghost wide" id="resetDemo">Сбросить демо</button>`;
+  document.getElementById('aboutStudent').onclick = () => setRole('student');
   document.getElementById('aboutFb').onclick = openFeedback;
   document.getElementById('aboutHow').onclick = showIntro;
   document.getElementById('aboutTour').onclick = startTour;
@@ -1624,9 +1679,9 @@ function renderAbout() {
 }
 
 // ---------- Навигация ----------
-document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+document.querySelectorAll('#app .tabs button').forEach(b => b.onclick = () => {
   state.tab = b.dataset.tab;
-  document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('#app .tabs button').forEach(x => x.classList.toggle('on', x === b));
   ['feed', 'matches', 'about'].forEach(t => document.getElementById('screen-' + t).hidden = t !== state.tab);
   if (state.tab === 'matches') { state.seenMatches = state.matches.length; updateBadge(); renderMatches(); }
   if (state.tab === 'about') renderAbout();
@@ -1883,7 +1938,7 @@ function showIntro() {
 }
 
 function maybeOfferFeedback() {
-  if (FB.offered || FB.sent) return;
+  if (ROLE === 'student' || FB.offered || FB.sent) return;
   FB.offered = true;
   toast('Есть минута? Ответьте на 3 вопроса — кнопка вверху');
 }
@@ -1965,6 +2020,7 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if (ROLE === 'student') { stKey(e); return; }
   // если фокус остался на списке вакансий — забираем стрелки себе, чтобы не открылась «Своя вакансия»
   if (document.activeElement === sel && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { e.preventDefault(); sel.blur(); }
   if (e.key === 'Escape') { if (!modal.hidden) closeModal(); else if (!sheet.hidden) closeProfile(); return; }
@@ -1987,9 +2043,9 @@ const TOUR_STEPS = [
     d: '✓ — интересно, ✕ — не подходит. Можно и смахнуть карточку вправо или влево. «Назад» вернёт последнего.' },
   { el: () => document.getElementById('bellBtn'), t: 'Уведомления',
     d: 'Здесь видно, кто из студентов сам откликнулся на вашу вакансию.' },
-  { el: () => document.querySelector('.tabs [data-tab="matches"]'), t: 'Мэтчи',
+  { el: () => document.querySelector('#app .tabs [data-tab="matches"]'), t: 'Мэтчи',
     d: 'Когда интерес взаимный, студент появится здесь вместе с Telegram. Договаривайтесь напрямую, а после работы оставьте отзыв в один клик.' },
-  { el: () => document.querySelector('.tabs [data-tab="about"]'), t: 'О сервисе',
+  { el: () => document.querySelector('#app .tabs [data-tab="about"]'), t: 'О сервисе',
     d: 'Почему профилям можно доверять. Здесь же можно снова открыть этот гид.' },
   { el: () => document.getElementById('fbPill'), t: 'Ваше мнение',
     d: '3 вопроса о демо, 1 минута. Для нас это самое ценное.' },
@@ -2000,7 +2056,7 @@ const visible = el => { if (!el) return false; const r = el.getBoundingClientRec
 
 function startTour() {
   // гид показывает главный экран: лента, режим карточек, без открытых окон
-  if (state.tab !== 'feed') document.querySelector('.tabs [data-tab="feed"]').click();
+  if (state.tab !== 'feed') document.querySelector('#app .tabs [data-tab="feed"]').click();
   if (state.view !== 'swipe') { state.view = 'swipe'; renderFeed(); }
   if (!sheet.hidden) closeProfile();
   if (!modal.hidden) closeModal();
@@ -2069,6 +2125,486 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.remove(), 3200);
 }
 
+// ===================== Студент: вакансии свайпами, мэтчи, профиль (18.11) =====================
+// Вы — Алина, вымышленная студентка с заполненным профилем. Подбор — те же правила fit(), что у работодателя:
+// график, навыки, требования, подтверждённый опыт. Не ИИ. В MVP студент работает в таком же мини-приложении.
+let ROLE = 'employer';
+const $id = id => document.getElementById(id);
+const ME = byId('a1');
+// answer — что делает работодатель: invite — сам пригласил студента первым; later — ответит взаимностью после отклика
+const ST_INFO = {
+  v1: { emoji: '☕', hue: 30, answer: 'later', desc: 'Кофе и касса в утренние смены и по выходным. Всему научим; медкнижка обязательна.' },
+  v2: { emoji: '🎤', hue: 280, answer: 'invite', desc: 'Конференции и вечеринки: регистрация гостей, навигация по площадке, тайминг.' },
+  v3: { emoji: '📱', hue: 200, desc: 'Сторис, посты и обложки для онлайн-школы. Удалённо, в удобное время.' },
+};
+const ST_EXTRA = [
+  { id: 's1', title: 'Администратор студии йоги', employer: 'Студия йоги «Прана»', format: 'Офлайн', schedule: ['Вечер будни'],
+    skills: ['Общение с людьми', 'Организация', 'Касса/продажи'], pay: '350 ₽/час', metro: 'Серпуховская', okrug: 'ЮАО',
+    req: [{ k: 'self', must: false }], verified: true, emoji: '🧘', hue: 150, answer: 'later',
+    desc: 'Встречать гостей, записывать на занятия, следить за порядком в зале. Три вечера в неделю.' },
+  { id: 's2', title: 'Промоутер на фестиваль', employer: 'Промо-агентство «Старт»', format: 'Офлайн', schedule: ['Выходные'],
+    skills: ['Общение с людьми', 'Стрессоустойчивость'], pay: '2 200 ₽/смена', metro: 'Курская', okrug: 'ЦАО',
+    req: [], verified: true, emoji: '📣', hue: 20,
+    desc: 'Промо и консультации гостей на гастрофестивале. Смена 6 часов, обед за счёт агентства.' },
+  { id: 's3', title: 'Ведение Telegram-канала', employer: 'Книжный магазин «Страница»', format: 'Удалённо', schedule: ['Гибкий'],
+    skills: ['Тексты', 'Соцсети'], pay: '15 000 ₽/мес', req: [{ k: 'laptop', must: true }], verified: false, emoji: '📚', hue: 255,
+    desc: 'Три поста в неделю о новинках и встречах с авторами. Можно из дома.' },
+  { id: 's4', title: 'Аниматор на детские праздники', employer: 'Студия праздников «Шарик»', format: 'Офлайн', schedule: ['Выходные'],
+    skills: ['Общение с людьми', 'Организация', 'Стрессоустойчивость'], pay: '1 800 ₽/праздник', metro: 'Тульская', okrug: 'ЮАО',
+    req: [{ k: 'med', must: true }], verified: true, emoji: '🎈', hue: 330,
+    desc: 'Праздники для детей 5–9 лет: игры, конкурсы, аквагрим. Сценарий и костюм выдаём.' },
+  { id: 's5', title: 'Курьер на своём авто', employer: 'Цветочная мастерская «Букет»', format: 'Офлайн', schedule: ['Утро будни', 'Выходные'],
+    skills: ['Тайм-менеджмент', 'Общение с людьми'], pay: '450 ₽/час', metro: 'Белорусская', okrug: 'ЦАО',
+    req: [{ k: 'license', must: true }, { k: 'car', must: true }], verified: true, emoji: '💐', hue: 100,
+    desc: 'Доставка букетов по центру на своей машине. Бензин компенсируем.' },
+];
+const STV = VACANCIES.filter(v => ST_INFO[v.id]).map(v => Object.assign(v, ST_INFO[v.id]))
+  .concat(ST_EXTRA.map(v => ({ ...v, status: 'active' })));
+const stVac = id => STV.find(v => v.id === id);
+const st = { tab: 'feed', decided: {}, history: [], invites: STV.filter(v => v.answer === 'invite').map(v => v.id),
+  waiting: [], matches: [], intro: {}, checkins: {}, seen: 0 };
+const stFit = v => fit(ME, v);
+// Не совпал формат или нет обязательного требования — вакансию не показываем (как в боте)
+const stOk = (v, f) => !!f && f.reqs.every(r => !r.must || r.has);
+const stQueue = () => STV.map(v => ({ v, f: stFit(v) }))
+  .filter(x => stOk(x.v, x.f) && !st.invites.includes(x.v.id) && !st.decided[x.v.id])
+  .sort((a, b) => b.f.score - a.f.score);
+const stWhere = v => v.format !== 'Офлайн' ? 'удалённо' : `м. ${v.metro} (${v.okrug})`;
+const stHiddenText = () => STV.filter(v => !stOk(v, stFit(v))).map(v => {
+  const f = stFit(v);
+  return `«${v.title}» — ${f ? 'нужно: ' + f.reqs.filter(r => r.must && !r.has).map(r => REQS[r.k].n).join(' и ') : 'другой формат работы'}`;
+}).join('; ');
+
+// ---------- Роль: работодатель или студент ----------
+function setRole(role) {
+  ROLE = role;
+  $id('app').hidden = role !== 'employer';
+  $id('studentApp').hidden = role !== 'student';
+  if (!sheet.hidden) closeProfile();
+  overlay.hidden = true;
+  if (role === 'student') stRender(); else renderFeed();
+  logEv('смотрит как ' + (role === 'student' ? 'студент' : 'работодатель'));
+}
+
+function openRoleChooser(first) {
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box intro">
+    <div class="brand"><span class="logo">Winder</span><span class="pill">ДЕМО</span></div>
+    <h3 style="font-size:20px;letter-spacing:-.02em;margin-bottom:0">Подработка для студентов — по опыту и отзывам, а не по резюме</h3>
+    <p class="small muted" style="margin:0">Посмотрите сервис с любой стороны — переключиться можно кнопкой «ДЕМО ⇄» вверху. Все люди и компании в демо вымышленные.</p>
+    <button class="btn primary wide" data-pick="employer">Я работодатель — ищу студентов</button>
+    <button class="btn ghost wide" data-pick="student">Я студент — ищу подработку</button></div>`;
+  modal.hidden = false;
+  modal.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => {
+    closeModal();
+    setRole(b.dataset.pick);
+    if (first) (b.dataset.pick === 'student' ? showStudentIntro : showIntro)();
+  });
+}
+
+function showStudentIntro() {
+  modal.className = 'modal';
+  modal.innerHTML = `<div class="modal-box intro">
+    <div class="brand"><span class="logo">Winder</span><span class="pill">ДЕМО</span></div>
+    <h3 style="font-size:20px;letter-spacing:-.02em;margin-bottom:0">Как найти подработку</h3>
+    <p class="small muted" style="margin:0">Вы — Алина, студентка 2 курса. Профиль уже заполнен.</p>
+    <ol class="steps">
+      <li><span class="num">1</span><span><b>Вакансии под вас.</b> Процент — насколько совпадают график, навыки и требования.<span class="muted">Нажмите на карточку — откроются подробности.</span></span></li>
+      <li><span class="num">2</span><span><b>Решите:</b> интересно — салатовая ✓, нет — ✕.<span class="muted">Можно смахнуть карточку. На компьютере — стрелки <span class="kbd">→</span> <span class="kbd">←</span>.</span></span></li>
+      <li><span class="num">3</span><span><b>Мэтч</b> — когда работодатель тоже заинтересован. Выберите: переписка через бота или показать свой Telegram.</span></li>
+      <li><span class="num">4</span><span><b>Приглашения</b> от работодателей — во вкладке «Мэтчи».</span></li>
+      <li><span class="num">5</span><span><b>После работы</b> работодатель оставит отзыв — он появится в профиле.</span></li>
+    </ol>
+    <button class="btn primary wide" id="stIntroGo">Смотреть вакансии</button></div>`;
+  modal.hidden = false;
+  $id('stIntroGo').onclick = () => { closeModal(); logEv('студент: начал демо'); };
+}
+
+function startDemo() {
+  const role = new URLSearchParams(location.search).get('role');
+  if (role === 'student' || role === 'employer') {
+    setRole(role);
+    (role === 'student' ? showStudentIntro : showIntro)();
+  } else openRoleChooser(true);
+}
+document.querySelectorAll('[data-role-switch]').forEach(b => b.onclick = () => openRoleChooser(false));
+
+// ---------- Экран студента ----------
+function stRender() {
+  $id('stMe').innerHTML = `Подбор под вас: <b>${ME.name}, ${ME.age}</b> · ${ME.schedule.join(', ').toLowerCase()} · ${ME.format.join(' и ').toLowerCase()} · м. ${ME.metro}`;
+  $id('stMe').hidden = st.tab !== 'feed';
+  ['feed', 'matches', 'profile', 'about'].forEach(t => { $id('st-' + t).hidden = t !== st.tab; });
+  document.querySelectorAll('#stTabs button').forEach(b => b.classList.toggle('on', b.dataset.stTab === st.tab));
+  if (st.tab === 'feed') stRenderDeck();
+  if (st.tab === 'matches') stRenderMatches();
+  if (st.tab === 'profile') stRenderProfile();
+  if (st.tab === 'about') stRenderAbout();
+  stBadges();
+}
+
+function stBadges() {
+  const n = Math.max(0, st.matches.length - st.seen) + st.invites.length;
+  [$id('stMatchBadge'), $id('stBellBadge')].forEach(b => { b.hidden = !n; b.textContent = n; });
+}
+
+function stSwitchTab(tab) {
+  st.tab = tab; haptic('tap'); stRender();
+  logEv('студент: вкладка ' + { feed: 'Вакансии', matches: 'Мэтчи', profile: 'Профиль', about: 'О сервисе' }[tab]);
+}
+
+// ---------- Карточка вакансии ----------
+function stCardHTML(v, f) {
+  const e = bestExp(ME, v), rel = relSkills(e, v);
+  const facts = [stWhere(v), v.schedule.join(', ')].concat(f.reqs.map(r => r.k === 'area'
+    ? (r.has ? '<span class="y">ваш округ</span>' : '<span class="n">другой округ</span>')
+    : r.has ? `<span class="y">${REQS[r.k].n}</span>` : `<span class="n">${REQS[r.k].n}</span>`)).join(' · ');
+  return `
+    <div class="hero vhero" style="background:${grad(v.hue)}">
+      <span class="vemoji">${v.emoji}</span>
+      <div><h2>${esc(v.title)}</h2><div class="sub">${esc(v.employer)}</div>${v.verified ? '<span class="edu-ok">✓ компания проверена</span>' : ''}</div>
+      <span class="stamp like">ИНТЕРЕСНО</span><span class="stamp nope">НЕТ</span>
+    </div>
+    <div class="body">
+      <div class="toprow"><div class="score"><b>${f.pct}%</b><span>подходит<br>вам</span></div><span class="rate">💰 ${esc(v.pay)}</span></div>
+      ${rel.length
+        ? `<div class="kv"><span class="lbl">Ваш опыт по вакансии</span><div class="exp-line"><b>${esc(e.r)}</b> — ${esc(e.org || e.t)}</div>${e.v ? `<span class="ver-badge">✓ подтвердил ${esc(e.v)}</span> ` : ''}<span class="rel">↔ ${esc(rel.join(', '))}</span></div>`
+        : `<div class="kv"><span class="lbl">О работе</span><div class="exp-line">${esc(v.desc)}</div></div>`}
+      <div class="meters">${meter('График', f.schedHit, f.schedTotal)}${meter('Навыки', f.skillHit, f.skillTotal)}${meter('Требования', f.reqHit, f.reqTotal)}</div>
+      <div class="facts-line">${facts}</div>
+    </div>`;
+}
+
+const stDeckEl = $id('stDeck');
+const stTopCard = () => stDeckEl.querySelector('.card:not(.behind)');
+
+function stRenderDeck() {
+  const q = stQueue();
+  stDeckEl.innerHTML = '';
+  $id('stActions').style.visibility = q.length ? 'visible' : 'hidden';
+  if (!q.length) {
+    const liked = st.history.filter(k => st.decided[k] === 'like').length;
+    const skipped = Object.values(st.decided).filter(d => d === 'nope').length;
+    const hidden = stHiddenText();
+    stDeckEl.innerHTML = `<div class="empty">
+      <div class="big">🎉</div><h3 style="margin:0">Вакансии закончились</h3>
+      <p class="muted" style="margin:0">Откликов: ${liked} · мэтчей: ${st.matches.length}${st.invites.length ? ` · приглашений: ${st.invites.length}` : ''}</p>
+      ${hidden ? `<p class="small muted" style="margin:0">Не показываем: ${esc(hidden)}</p>` : ''}
+      <button class="btn primary" id="stGoMatches">Мэтчи и приглашения</button>
+      ${skipped ? '<button class="btn" id="stRestart">Показать пропущенные</button>' : ''}</div>`;
+    $id('stGoMatches').onclick = () => stSwitchTab('matches');
+    const r = $id('stRestart');
+    if (r) r.onclick = () => {
+      Object.keys(st.decided).forEach(k => { if (st.decided[k] === 'nope') delete st.decided[k]; });
+      st.history = st.history.filter(k => st.decided[k]);
+      stRenderDeck();
+    };
+    return;
+  }
+  q.slice(0, 2).reverse().forEach((x, i, arr) => {
+    const el = document.createElement('div');
+    el.className = 'card' + (i < arr.length - 1 ? ' behind' : '');
+    el.innerHTML = stCardHTML(x.v, x.f);
+    el.dataset.vid = x.v.id;
+    stDeckEl.appendChild(el);
+  });
+  stAttachDrag(stDeckEl.lastElementChild);
+}
+
+function stAttachDrag(el) {
+  let sx = 0, sy = 0, dx = 0, dy = 0, down = false;
+  const like = el.querySelector('.stamp.like'), nope = el.querySelector('.stamp.nope');
+  const behind = stDeckEl.querySelector('.card.behind');
+  const lift = k => { if (behind) behind.style.transform = k ? `scale(${0.94 + 0.06 * k}) translateY(${14 - 14 * k}px)` : ''; };
+  el.addEventListener('pointerdown', e => {
+    down = true; sx = e.clientX; sy = e.clientY; dx = dy = 0;
+    el.setPointerCapture(e.pointerId); el.classList.add('dragging');
+  });
+  el.addEventListener('pointermove', e => {
+    if (!down) return;
+    dx = e.clientX - sx; dy = e.clientY - sy;
+    el.style.transform = `translate(${dx}px, ${dy * 0.25}px) rotate(${dx / 18}deg)`;
+    like.style.opacity = Math.max(0, Math.min(1, dx / 90));
+    nope.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+    if (behind) behind.style.transition = 'none';
+    lift(Math.min(1, Math.abs(dx) / 140));
+  });
+  const end = () => {
+    if (!down) return;
+    down = false; el.classList.remove('dragging');
+    if (Math.abs(dx) > 100) { stDecide(dx > 0 ? 'like' : 'nope'); return; }
+    if (Math.abs(dx) < 6 && Math.abs(dy) < 6) stOpenVacancy(el.dataset.vid);
+    el.style.transform = ''; like.style.opacity = 0; nope.style.opacity = 0;
+    if (behind) behind.style.transition = ''; lift(0);
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+}
+
+// ---------- Отклик, приглашение, мэтч ----------
+function stDecide(dir, vid) {
+  const top = stTopCard();
+  vid = vid || (top && top.dataset.vid);
+  const v = vid && stVac(vid);
+  if (!v || st.decided[vid]) return;
+  haptic('tap');
+  st.decided[vid] = dir;
+  st.history.push(vid);
+  logEv(`студент: ${dir === 'like' ? '✓ интересно' : '✕ не интересно'} — ${v.title}`);
+  if (dir === 'like') {
+    st.waiting.push(vid);
+    toast('Отклик отправлен. Ответит взаимностью — будет мэтч');
+    // в демо часть работодателей «отвечает» через несколько секунд
+    if (v.answer === 'later') setTimeout(() => { if (st.decided[vid] === 'like' && st.waiting.includes(vid)) stMatch(vid, 'answer'); }, 5000);
+  }
+  if (top && top.dataset.vid === vid) {
+    top.classList.remove('dragging');
+    top.querySelector('.stamp.' + dir).style.opacity = 1;
+    top.style.transform = `translate(${dir === 'like' ? 150 : -150}vw, 40px) rotate(${dir === 'like' ? 25 : -25}deg)`;
+    top.style.opacity = 0;
+    setTimeout(stRender, 260);
+  } else stRender();
+}
+
+function stUndo() {
+  const vid = st.history[st.history.length - 1];
+  if (!vid) { toast('Пока нечего возвращать'); return; }
+  if (st.matches.some(m => m.vid === vid)) { toast('С этим работодателем уже мэтч — отменить нельзя'); return; }
+  st.history.pop();
+  delete st.decided[vid];
+  st.waiting = st.waiting.filter(x => x !== vid);
+  haptic('tap'); stRender();
+}
+
+function stDeclineInvite(vid) {
+  st.invites = st.invites.filter(x => x !== vid);
+  st.decided[vid] = 'nope';
+  logEv('студент: отклонил приглашение — ' + stVac(vid).title);
+  toast('Приглашение отклонено — работодатель увидит вежливый отказ');
+  stRender();
+}
+
+function stMatch(vid, via) {
+  if (st.matches.some(m => m.vid === vid)) return;
+  const v = stVac(vid);
+  st.waiting = st.waiting.filter(x => x !== vid);
+  st.invites = st.invites.filter(x => x !== vid);
+  st.decided[vid] = 'like';
+  st.matches.unshift({ vid, at: Date.now() });
+  logEv('студент: 🤝 мэтч — ' + v.title + (via === 'invite' ? ' (принял приглашение)' : ''));
+  if (st.tab === 'matches') stRenderMatches();
+  stBadges();
+  if (ROLE !== 'student') return;
+  haptic('match');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `<div class="match-box">
+    <div class="match-avas">
+      <div class="ava" style="background:${grad(ME.hue)}">${ME.name[0]}</div>
+      <div class="ava emo" style="background:${grad(v.hue)}">${v.emoji}</div>
+    </div>
+    <h2>Это мэтч!</h2>
+    <p style="margin:0;opacity:.9">${via === 'invite' ? 'Вы приняли приглашение' : 'Работодатель тоже заинтересован'}: «${esc(v.title)}», ${esc(v.employer)}. Как познакомиться?</p>
+    <button class="btn primary" data-intro="chat">Переписка через бота — Telegram скрыт</button>
+    <button class="btn ghost" data-intro="tg">Показать мой Telegram</button>
+    <button class="btn ghost" data-intro="later">Решу позже</button></div>`;
+  overlay.hidden = false;
+  overlay.querySelectorAll('[data-intro]').forEach(b => b.onclick = () => {
+    overlay.hidden = true;
+    if (b.dataset.intro === 'later') { toast('Выбрать можно во вкладке «Мэтчи»'); return; }
+    stSetIntro(vid, b.dataset.intro);
+    toast('Дальше — во вкладке «Мэтчи»');
+  });
+}
+
+function stSetIntro(vid, mode) {
+  st.intro[vid] = mode;
+  logEv('студент: знакомство — ' + (mode === 'chat' ? 'переписка через бота' : 'показал Telegram'));
+  if (st.tab === 'matches') stRenderMatches();
+}
+
+// ---------- Мэтчи и приглашения ----------
+const stBot = t => `<div class="bot"><span class="bot-ava">W</span><div class="bot-msg">${t}</div></div>`;
+const stChoices = (vid, field, opts) => `<div class="choices">${opts.map(([val, label]) =>
+  `<button data-stck="${vid}" data-f="${field}" data-v="${val}">${label}</button>`).join('')}</div>`;
+
+function stCheckinHTML(v) {
+  const c = st.checkins[v.id] || {};
+  if (!c.deal) return stBot('Удалось договориться о подработке? <span class="muted">В продукте бот спросит через пару дней, в демо — сразу.</span>')
+    + stChoices(v.id, 'deal', [['yes', 'Да'], ['talking', 'Ещё общаемся'], ['no', 'Нет']]);
+  if (c.deal === 'talking') return stBot('Хорошо, спросим ещё раз через 3 дня.');
+  if (c.deal === 'no') return stBot('Жаль. Загляните в ленту — подберём другие вакансии.');
+  if (!c.started) return stBot('Отлично! Вы вышли на работу?') + stChoices(v.id, 'started', [['yes', 'Да, вышла'], ['no', 'Ещё нет']]);
+  if (c.started === 'no') return stBot('Удачи! Спросим после первой смены.');
+  return stBot('Поздравляем! После смены работодатель оставит отзыв — он появится в вашем профиле: оценки видны сразу, тексты — после третьего отзыва.');
+}
+
+function stMatchHTML(m) {
+  const v = stVac(m.vid), mode = st.intro[v.id];
+  let body;
+  if (!mode) body = stBot('Как познакомиться с работодателем?') + stChoices(v.id, 'intro', [['chat', 'Переписка через бота'], ['tg', 'Показать мой Telegram']]);
+  else if (mode === 'chat') body = `<div class="lock">💬<span>Переписка через бота — ваш Telegram скрыт.</span></div>
+    <div class="bot"><span class="bot-ava" style="background:${grad(v.hue)}">${v.emoji}</span><div class="bot-msg"><b>${esc(v.employer)}:</b> Здравствуйте, ${ME.name}! Удобно зайти познакомиться на этой неделе?</div></div>`
+    + stCheckinHTML(v);
+  else body = `<div class="lock">✈️<span>Работодатель видит ваш Telegram <b>${esc(ME.handle)}</b> и напишет первым.</span></div>` + stCheckinHTML(v);
+  return `<div class="review">
+    <div class="mrow"><div class="ava emo" style="background:${grad(v.hue)}">${v.emoji}</div>
+      <div class="grow"><div class="name">${esc(v.title)}</div><div class="small muted">${esc(v.employer)} · ${esc(v.pay)} · ${esc(stWhere(v))}</div></div>
+      <span class="status ok-s">🤝 мэтч</span></div>${body}</div>`;
+}
+
+function stRenderMatches() {
+  const page = $id('stMatchesPage');
+  st.seen = st.matches.length;
+  const invites = st.invites.map(stVac), waiting = st.waiting.map(stVac);
+  let html = '';
+  if (invites.length) html += `<div class="panel"><h3>Приглашения</h3>${invites.map(v => `<div class="review">
+    <div class="mrow"><div class="ava emo" style="background:${grad(v.hue)}">${v.emoji}</div>
+      <div class="grow"><div class="name">${esc(v.title)}</div><div class="small muted">${esc(v.employer)} · ${esc(v.pay)} · подходит на ${stFit(v).pct}%</div></div></div>
+    ${stBot('Работодатель посмотрел ваш профиль и приглашает на подработку. Интересно?')}
+    <div class="choices"><button data-inv-yes="${v.id}">Да, интересно</button><button data-inv-no="${v.id}">Нет</button><button data-inv-more="${v.id}">Подробнее</button></div></div>`).join('')}</div>`;
+  if (st.matches.length) html += `<div class="panel"><h3>Взаимный интерес</h3>${st.matches.map(stMatchHTML).join('')}</div>`;
+  if (waiting.length) html += `<div class="panel"><h3>Отклики — ждём ответа</h3>${waiting.map(v => `<div class="mrow">
+    <div class="ava emo" style="background:${grad(v.hue)}">${v.emoji}</div>
+    <div class="grow"><div class="name">${esc(v.title)}</div><div class="small muted">${esc(v.employer)} · ${esc(v.pay)}</div></div>
+    <span class="status">отклик отправлен</span></div>`).join('')}
+    <p class="small muted">Работодатель видит ваш профиль без контактов. Ответит взаимностью — будет мэтч.</p></div>`;
+  if (!html) html = `<div class="panel"><h3>Пока пусто</h3><p class="small muted" style="margin:0">Отмечайте интересные вакансии во вкладке «Вакансии» — здесь появятся мэтчи и приглашения от работодателей.</p></div>`;
+  page.innerHTML = html;
+}
+
+$id('stMatchesPage').onclick = e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.invYes) { stMatch(b.dataset.invYes, 'invite'); return; }
+  if (b.dataset.invNo) { stDeclineInvite(b.dataset.invNo); return; }
+  if (b.dataset.invMore) { stOpenVacancy(b.dataset.invMore); return; }
+  if (b.dataset.stck) {
+    const vid = b.dataset.stck;
+    if (b.dataset.f === 'intro') { stSetIntro(vid, b.dataset.v); return; }
+    st.checkins[vid] = { ...(st.checkins[vid] || {}), [b.dataset.f]: b.dataset.v };
+    logEv(`студент: ${b.dataset.f === 'deal' ? 'договорились' : 'вышла на работу'} — ${b.textContent}`);
+    stRenderMatches();
+  }
+};
+
+// ---------- Вакансия подробно ----------
+function stOpenVacancy(vid) {
+  const v = stVac(vid), f = v && stFit(v);
+  if (!f) return;
+  const invited = st.invites.includes(vid), matched = st.matches.some(m => m.vid === vid);
+  const e = bestExp(ME, v), rel = relSkills(e, v);
+  const area = f.reqs.find(r => r.k === 'area');
+  const req = r => `<div class="fact"><span class="fk">${REQS[r.k].i} ${REQS[r.k].n}</span><span>${r.must ? 'обязательно' : 'желательно'} · ${r.has ? '<span class="ok">✓ у вас есть</span>' : '<span class="need">у вас нет</span>'}</span></div>`;
+  sheet.innerHTML = `<div class="sheet-inner">
+    <div class="hero vhero" style="background:${grad(v.hue)}">
+      <span class="handle"></span>
+      <button class="close" id="stCloseSheet" aria-label="Закрыть">${ICON.x}</button>
+      <span class="vemoji">${v.emoji}</span>
+      <div><h2>${esc(v.title)}</h2><div class="sub">${esc(v.employer)}</div>${v.verified ? '<span class="edu-ok">✓ компания проверена по ИНН</span>' : ''}</div>
+    </div>
+    <div class="page">
+      <div class="panel why"><div class="lbl">Насколько вам подходит</div>
+        <div class="score big"><b>${f.pct}%</b><span>по понятным правилам,<br>а не «ИИ-подбор»</span></div>
+        <p>График: ${f.schedHit} из ${f.schedTotal} · Навыки: ${f.skillHit} из ${f.skillTotal} · Требования: ${f.reqHit} из ${f.reqTotal} · Ваш опыт по вакансии: ${f.expFit === 1 ? 'подтверждён' : f.expFit ? 'есть, без подтверждения' : 'нет'}</p></div>
+      <div class="panel"><h3>О работе</h3><p>${esc(v.desc)}</p>
+        <div class="facts">
+          <div class="fact"><span class="fk">💰 Оплата</span><span>${esc(v.pay)}</span></div>
+          <div class="fact"><span class="fk">${v.format === 'Офлайн' ? '📍' : '💻'} Где</span><span>${esc(stWhere(v))}</span></div>
+        </div></div>
+      <div class="panel"><h3>График</h3><div class="row">${v.schedule.map(x => chip(x, ME.schedule.includes('Гибкий') || x === 'Гибкий' || ME.schedule.includes(x))).join('')}</div>
+        <p class="small muted">✓ — совпадает с вашим графиком</p></div>
+      <div class="panel"><h3>Навыки</h3><div class="row">${v.skills.map(x => chip(x, ME.skills.includes(x))).join('')}</div>
+        <p class="small muted">✓ — есть в вашем профиле</p>
+        ${rel.length ? `<p class="small">Ваш опыт: <b>${esc(e.r)}</b> — ${esc(e.org || e.t)} <span class="rel">↔ ${esc(rel.join(', '))}</span></p>` : ''}</div>
+      ${f.reqs.length ? `<div class="panel"><h3>Требования</h3><div class="facts">${f.reqs.filter(r => r.k !== 'area').map(req).join('')}${area
+        ? `<div class="fact"><span class="fk">📍 Округ</span><span>${esc(v.okrug)} · ${area.has ? '<span class="ok">✓ вы готовы там работать</span>' : '<span class="need">не ваш округ</span>'}</span></div>` : ''}</div></div>` : ''}
+      <div class="panel"><h3>Работодатель</h3><p>${esc(v.employer)} — ${v.verified ? '<span class="ok">✓ компания проверена по ИНН</span>' : 'ИНН не указан, компания не проверена'}</p>
+        <div class="lock">🔒<span>Контакты откроются после взаимного интереса. До этого работодатель видит ваш профиль без Telegram.</span></div></div>
+    </div></div>
+    ${!st.decided[vid] && !matched ? `<div class="sheet-actions">
+      <button class="btn-round nope" id="stSNope" aria-label="Не интересно">${ICON.x}</button>
+      <button class="btn-round like" id="stSLike" aria-label="Интересно">${ICON.check}</button></div>` : ''}`;
+  sheet.hidden = false; sheet.scrollTop = 0;
+  $id('stCloseSheet').onclick = closeProfile;
+  const yes = $id('stSLike'), no = $id('stSNope');
+  if (yes) yes.onclick = () => { closeProfile(); setTimeout(() => (invited ? stMatch(vid, 'invite') : stDecide('like', vid)), 50); };
+  if (no) no.onclick = () => { closeProfile(); setTimeout(() => (invited ? stDeclineInvite(vid) : stDecide('nope', vid)), 50); };
+  if (inTelegram) tg.BackButton.show();
+  logEv('студент: открыл вакансию — ' + v.title);
+}
+
+// ---------- Профиль ----------
+function stRenderProfile() {
+  const s = ME, stt = stats(s);
+  const bars = CATS.map(c => {
+    const self = s.self[c.k], peer = stt.n ? stt.per[c.k] : null;
+    return `<div class="bar-row"><span>${c.n}</span><div class="bar-pair">
+      <div class="bar self"><i style="width:${self * 20}%"></i></div>
+      ${peer !== null ? `<div class="bar peer"><i style="width:${peer * 20}%"></i></div>` : ''}</div></div>`;
+  }).join('');
+  const fact = (icon, label, value) => `<div class="fact"><span class="fk">${icon} ${label}</span><span>${value}</span></div>`;
+  $id('stProfilePage').innerHTML = `
+    <div class="panel">
+      <div class="mrow"><div class="ava" style="background:${grad(s.hue)};width:56px;height:56px;font-size:22px">${s.name[0]}</div>
+        <div class="grow"><div class="name" style="font-size:18px">${s.name}, ${s.age}</div><div class="small muted">${esc(s.uni)}</div>
+          ${s.eduOk ? '<span class="ver-badge">🎓 студент подтверждён</span>' : ''}</div></div>
+      <div class="lock">✅<span><b>Профиль опубликован</b> — его видят работодатели. Контакты — только после взаимного интереса.</span></div>
+      <button class="btn ghost wide" id="stEdit">Изменить анкету</button></div>
+    <div class="panel"><h3>Как вас видят работодатели</h3>${ratingHTML(s)}
+      <div class="facts">${fact('💰', 'Ставка', esc(s.pay))}${fact('⏱️', 'Свободны', s.hours + ' ч в неделю')}${fact('📅', 'График', esc(s.schedule.join(', ')))}${fact('📍', 'Формат', esc(s.format.join(', ')))}${fact('🚇', 'Метро', 'м. ' + esc(s.metro))}${fact('🗺', 'Округа', esc(s.areas.join(', ')))}</div></div>
+    <div class="panel"><h3>Навыки</h3><div class="row">${s.skills.map(x => chip(x)).join('')}</div></div>
+    <div class="panel"><h3>Опыт</h3>${s.exp.map(e => `<div class="mrow"><div class="grow">
+        <div class="exp-kind">${esc(e.kind || 'опыт')}</div><div class="name">${esc(e.r)}</div>
+        <div class="small muted">${esc(e.org || e.t)}</div>${e.d ? `<div class="exp-d">${esc(e.d)}</div>` : ''}
+        ${e.v ? `<span class="ver-badge">✓ подтвердил ${esc(e.v)}</span>` : '<span class="status">не подтверждено</span>'}</div></div>`).join('')}
+      <p class="small muted">Подтверждённый опыт поднимает вас в подборе. Подтверждает тот, кто отвечал за проект, — по ссылке, одной кнопкой; каждое подтверждение проверяет команда.</p></div>
+    <div class="panel"><h3>Сильные стороны</h3>
+      <div class="legend"><span class="ls">Ваша самооценка</span>${stt.n ? '<span class="lp">Оценки из отзывов</span>' : ''}</div>
+      <div class="bars">${bars}</div>
+      <p class="small muted">Самооценка — ваш взгляд на себя, а не психологическая диагностика. Работодатель видит её рядом с оценками из реальных отзывов.</p></div>
+    <div class="panel"><h3>Отзывы работодателей</h3>${stt.n >= MIN_PUBLIC_TEXTS
+      ? s.reviews.map(r => `<div class="review"><div class="who">${esc(r.a)} · ${esc(r.rel)} · ${r.rec ? '👍 нанял(а) бы снова' : '— не уверен(а), что нанял(а) бы снова'}</div>${r.t ? `<div>${esc(r.t)}</div>` : ''}</div>`).join('')
+      : `<div class="lock">🔒<span>Тексты отзывов открываются после ${MIN_PUBLIC_TEXTS}-го.</span></div>`}
+      <p class="small muted">Отзыв оставляет только работодатель, к которому вы реально вышли на работу через Winder.</p></div>
+    <div class="panel"><h3>Данные</h3><p class="small" style="margin:0">Анкета хранится на сервере в России. Удалить все свои данные можно в любой момент.</p></div>`;
+  $id('stEdit').onclick = () => toast('В демо анкета заполнена заранее. В продукте после правки профиль снова проверяет команда');
+}
+
+// ---------- О сервисе ----------
+function stRenderAbout() {
+  $id('stAboutPage').innerHTML = `
+    <div class="panel"><h3>Как это работает</h3><ol class="steps">
+      <li><span class="num">1</span><span><b>Профиль без резюме.</b> Опыт из проектов и мероприятий — его подтверждает организатор, преподаватель или руководитель.</span></li>
+      <li><span class="num">2</span><span><b>Вакансии под вас.</b> Процент — насколько совпадают график, навыки и требования. Не хватает обязательного — вакансию не показываем.</span></li>
+      <li><span class="num">3</span><span><b>Решите:</b> интересно — ✓, нет — ✕. Можно смахнуть карточку; на компьютере — стрелки <span class="kbd">→</span> <span class="kbd">←</span>.</span></li>
+      <li><span class="num">4</span><span><b>Взаимный интерес — мэтч.</b> Выберите: переписка через бота (ваш Telegram скрыт) или показать свой Telegram.</span></li>
+      <li><span class="num">5</span><span><b>Отзыв.</b> После выхода на работу работодатель оставит отзыв — так копится ваша подтверждённая история.</span></li>
+    </ol></div>
+    <div class="panel"><h3>Честно о подборе</h3>
+      <p>По понятным правилам, не «ИИ»: график — 35%, навыки — 25%, требования — 20%, подтверждённый опыт — 10%, заполненность профиля — 10%.</p>
+      <p class="small muted">Только 18+. Вакансии проверяет команда; у компаний, сверенных по ИНН, — отметка «✓ компания проверена».</p></div>
+    <div class="panel"><h3>Это демо</h3>
+      <p class="small" style="margin:0">Вы смотрите глазами Алины — вымышленной студентки. Все компании и вакансии тоже вымышленные.</p>
+      <button class="btn primary wide" id="stToEmployer">Посмотреть глазами работодателя</button>
+      <button class="btn ghost wide" id="stIntroAgain">Инструкция ещё раз</button></div>`;
+  $id('stToEmployer').onclick = () => setRole('employer');
+  $id('stIntroAgain').onclick = showStudentIntro;
+}
+
+// ---------- Кнопки и клавиатура ----------
+document.querySelectorAll('#stTabs button').forEach(b => b.onclick = () => stSwitchTab(b.dataset.stTab));
+$id('stBell').onclick = () => stSwitchTab('matches');
+$id('stLike').onclick = () => stDecide('like');
+$id('stNope').onclick = () => stDecide('nope');
+$id('stUndo').onclick = stUndo;
+$id('stInfo').onclick = () => { const el = stTopCard(); if (el) stOpenVacancy(el.dataset.vid); };
+
+function stKey(e) {
+  if (e.key === 'Escape') { if (!modal.hidden) closeModal(); else if (!sheet.hidden) closeProfile(); else overlay.hidden = true; return; }
+  if (!modal.hidden || !sheet.hidden || !overlay.hidden || st.tab !== 'feed') return;
+  if (e.key === 'ArrowRight') stDecide('like');
+  if (e.key === 'ArrowLeft') stDecide('nope');
+}
+
 renderFeed();
 
 // Стартовые уведомления: двое студентов уже отметили первую вакансию
@@ -2077,7 +2613,7 @@ renderFeed();
   text: `<b>${byId(sid).name}</b> отметил(а) вашу вакансию «${VACANCIES[0].title}»`,
 }));
 updateBell();
-showIntro();
+startDemo();
 // Через 45 секунд — «живой» отклик от студента, который подходит под текущую вакансию
 setTimeout(() => {
   const v = vac();
